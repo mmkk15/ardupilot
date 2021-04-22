@@ -12,6 +12,14 @@
 #error CONFIG_HAL_BOARD must be defined to build ArduSub
 #endif
 
+// RUDOLF DIESEL PARAMETERS
+#define		RD_FWD_CMD_RM_T_DEFAULT		0.5f
+#define		RD_LAT_CMD_RM_T_DEFAULT		0.5f
+#define		RD_YAW_CMD_RM_T_DEFAULT		0.5f
+#define		RD_THR_CMD_RM_T_DEFAULT		0.5f
+#define		RD_CTRL_EXPO_DEFAULT		1.0f
+#define		RD_SIDEDIVE					0.0f
+
 // run at 400Hz on all systems
 # define MAIN_LOOP_RATE    400
 # define MAIN_LOOP_SECONDS 0.0025f

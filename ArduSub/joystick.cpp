@@ -28,6 +28,8 @@ uint8_t roll_pitch_flag = false; // Flag to adjust roll/pitch instead of forward
 bool controls_reset_since_input_hold = true;
 }
 
+
+/*************************************************************************************************************************************************************/
 void Sub::init_joystick()
 {
     default_js_buttons();
@@ -51,22 +53,35 @@ void Sub::init_joystick()
     gain = constrain_float(gain, 0.1, 1.0);
 }
 
+
+/*************************************************************************************************************************************************************/
+/*** x, y, z, r in [-1000; 1000] ***/
 void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t z, int16_t r, uint16_t buttons)
 {
-
-    float rpyScale = 0.4*gain; // Scale -1000-1000 to -400-400 with gain
-    float throttleScale = 0.8*gain*g.throttle_gain; // Scale 0-1000 to 0-800 times gain
-    int16_t rpyCenter = 1500;
-    int16_t throttleBase = 1500-500*throttleScale;
-
-    bool shift = false;
+	bool 		shift 			= false;
+    float 		rpyScale 		= 0.4 * gain; 											// Scale -1000-1000 to -400-400 with gain
+    float 		throttleScale 	= 0.8 * gain * g.throttle_gain; 						// Scale 0-1000 to 0-800 times gain
+    int16_t 	rpyCenter 		= 1500;
+    int16_t 	throttleBase 	= 1500-500*throttleScale;
+	
+	float		gamma 			= constrain_float(g.rd_ctrl_expo, 1.0, 3.0);				// Limit gamma value for expo control
+	float		xf 				= (float)constrain_int16(x, -1000, 1000) / 1000.0f;			// Calculate normalized values
+	float		yf 				= (float)constrain_int16(y, -1000, 1000) / 1000.0f;
+	float		zf 				= (float)constrain_int16(z, -1000, 1000) / 1000.0f;
+	float		rf 				= (float)constrain_int16(r, -1000, 1000) / 1000.0f;
+	
+	x 	= (int16_t)(powf(fabs(xf), gamma) * 1000.0f * copysignf(1.0f, xf));
+	y 	= (int16_t)(powf(fabs(yf), gamma) * 1000.0f * copysignf(1.0f, yf));
+	z 	= (int16_t)(powf(fabs(zf), gamma) * 1000.0f * copysignf(1.0f, zf));
+	r 	= (int16_t)(powf(fabs(rf), gamma) * 1000.0f * copysignf(1.0f, rf));
 
     // Neutralize camera tilt and pan speed setpoint
-    cam_tilt = 1500;
-    cam_pan = 1500;
+    cam_tilt 	= 1500;
+    cam_pan 	= 1500;
 
     // Detect if any shift button is pressed
-    for (uint8_t i = 0 ; i < 16 ; i++) {
+    for (uint8_t i = 0 ; i < 16 ; i++)
+	{
         if ((buttons & (1 << i)) && get_button(i)->function() == JSButton::button_function_t::k_shift) {
             shift = true;
         }
@@ -74,11 +89,15 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
 
     // Act if button is pressed
     // Only act upon pressing button and ignore holding. This provides compatibility with Taranis as joystick.
-    for (uint8_t i = 0 ; i < 16 ; i++) {
-        if ((buttons & (1 << i))) {
+    for (uint8_t i = 0 ; i < 16 ; i++) 
+	{
+        if ((buttons & (1 << i))) 
+		{
             handle_jsbutton_press(i,shift,(buttons_prev & (1 << i)));
             // buttonDebounce = tnow_ms;
-        } else if (buttons_prev & (1 << i)) {
+        } 
+		else if (buttons_prev & (1 << i)) 
+		{
             handle_jsbutton_release(i, shift);
         }
     }
@@ -86,7 +105,8 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
     buttons_prev = buttons;
 
     // attitude mode:
-    if (roll_pitch_flag == 1) {
+    if (roll_pitch_flag == 1) 
+	{
     // adjust roll/pitch trim with joystick input instead of forward/lateral
         pitchTrim = -x * rpyScale;
         rollTrim  =  y * rpyScale;
@@ -97,18 +117,39 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
     int16_t zTot;
     int16_t yTot;
     int16_t xTot;
+	static float 	xTotFilt = 0.0f;
+	static float 	yTotFilt = 0.0f;
+	static float 	zTotFilt = 0.0f;
+	static float 	rFilt 	 = 0.0f;
 
-    if (!controls_reset_since_input_hold) {
+    if (!controls_reset_since_input_hold) 
+	{
         zTot = zTrim + 500; // 500 is neutral for throttle
         yTot = yTrim;
         xTot = xTrim;
         // if all 3 axes return to neutral, than we're ready to accept input again
         controls_reset_since_input_hold = (abs(z - 500) < 50) && (abs(y) < 50) && (abs(x) < 50);
-    } else {
+    } 
+	else 
+	{
         zTot = z + zTrim;
         yTot = y + yTrim;
         xTot = x + xTrim;
     }
+	
+	// Filter xTot
+	if(g.rd_fwd_cmd_RM_T > 0.99f)	{	g.rd_fwd_cmd_RM_T = 0.99f;	}							// Check limit of forward cmd filter
+	if(g.rd_lat_cmd_RM_T > 0.99f)	{	g.rd_lat_cmd_RM_T = 0.99f;	}							// Check limit of forward lat filter
+	if(g.rd_yaw_cmd_RM_T > 0.99f)	{	g.rd_yaw_cmd_RM_T = 0.99f;	}							// Check limit of forward yaw filter
+	if(g.rd_thr_cmd_RM_T > 0.99f)	{	g.rd_thr_cmd_RM_T = 0.99f;	}							// Check limit of forward thr filter
+	xTotFilt 	= (1.0f - g.rd_fwd_cmd_RM_T) * (float)xTot + g.rd_fwd_cmd_RM_T * xTotFilt;
+	xTot 		= (int16_t)xTotFilt;
+	yTotFilt 	= (1.0f - g.rd_lat_cmd_RM_T) * (float)yTot + g.rd_lat_cmd_RM_T * yTotFilt;
+	yTot 		= (int16_t)yTotFilt;
+	zTotFilt 	= (1.0f - g.rd_thr_cmd_RM_T) * (float)zTot + g.rd_thr_cmd_RM_T * zTotFilt;
+	zTot 		= (int16_t)zTotFilt;
+	rFilt 		= (1.0f - g.rd_yaw_cmd_RM_T) * (float)r    + g.rd_yaw_cmd_RM_T * rFilt;
+	r 			= (int16_t)rFilt;
 
     RC_Channels::set_override(0, constrain_int16(pitchTrim + rpyCenter,1100,1900), tnow); // pitch
     RC_Channels::set_override(1, constrain_int16(rollTrim  + rpyCenter,1100,1900), tnow); // roll
@@ -117,11 +158,14 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
     RC_Channels::set_override(3, constrain_int16(r*rpyScale+rpyCenter,1100,1900), tnow);                 // yaw
 
     // maneuver mode:
-    if (roll_pitch_flag == 0) {
+    if (roll_pitch_flag == 0) 
+	{
         // adjust forward and lateral with joystick input instead of roll and pitch
         RC_Channels::set_override(4, constrain_int16((xTot)*rpyScale+rpyCenter,1100,1900), tnow); // forward for ROV
         RC_Channels::set_override(5, constrain_int16((yTot)*rpyScale+rpyCenter,1100,1900), tnow); // lateral for ROV
-    } else {
+    }
+	else
+	{
         // neutralize forward and lateral input while we are adjusting roll and pitch
         RC_Channels::set_override(4, constrain_int16(xTrim*rpyScale+rpyCenter,1100,1900), tnow); // forward for ROV
         RC_Channels::set_override(5, constrain_int16(yTrim*rpyScale+rpyCenter,1100,1900), tnow); // lateral for ROV
@@ -139,6 +183,8 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
     z_last = z;
 }
 
+
+/*************************************************************************************************************************************************************/
 void Sub::handle_jsbutton_press(uint8_t button, bool shift, bool held)
 {
     // Used for trimming level in vehicle frame
@@ -592,12 +638,11 @@ void Sub::handle_jsbutton_press(uint8_t button, bool shift, bool held)
             roll_pitch_flag = !roll_pitch_flag;
         }
         break;
-
     case JSButton::button_function_t::k_custom_1:
-        // Not implemented
+		g.rd_sidedive = 1.0f;
         break;
     case JSButton::button_function_t::k_custom_2:
-        // Not implemented
+		g.rd_sidedive = 0.0f;
         break;
     case JSButton::button_function_t::k_custom_3:
         // Not implemented
@@ -614,6 +659,8 @@ void Sub::handle_jsbutton_press(uint8_t button, bool shift, bool held)
     }
 }
 
+
+/*************************************************************************************************************************************************************/
 void Sub::handle_jsbutton_release(uint8_t button, bool shift) {
 
     // Act based on the function assigned to this button
@@ -654,6 +701,8 @@ void Sub::handle_jsbutton_release(uint8_t button, bool shift) {
     }
 }
 
+
+/*************************************************************************************************************************************************************/
 JSButton* Sub::get_button(uint8_t index)
 {
     // Help to access appropriate parameter
@@ -695,6 +744,8 @@ JSButton* Sub::get_button(uint8_t index)
     }
 }
 
+
+/*************************************************************************************************************************************************************/
 void Sub::default_js_buttons()
 {
     JSButton::button_function_t defaults[16][2] = {
@@ -724,6 +775,8 @@ void Sub::default_js_buttons()
     }
 }
 
+
+/*************************************************************************************************************************************************************/
 void Sub::set_neutral_controls()
 {
     uint32_t tnow = AP_HAL::millis();
@@ -744,3 +797,11 @@ void Sub::clear_input_hold()
     zTrim = 0;
     input_hold_engaged = false;
 }
+
+
+
+
+
+
+
+

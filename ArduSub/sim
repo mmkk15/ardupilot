@@ -1,0 +1,1 @@
+sim_vehicle.py -L RATBeach --out=udp:10.0.0.10:14550 --map --console

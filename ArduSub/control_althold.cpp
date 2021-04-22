@@ -16,7 +16,7 @@ bool Sub::althold_init()
     // sets the maximum speed up and down returned by position controller
     pos_control.set_max_speed_z(-get_pilot_speed_dn(), g.pilot_speed_up);
     pos_control.set_max_accel_z(g.pilot_accel_z);
-    pos_control.relax_alt_hold_controllers();
+
     pos_control.set_target_to_stopping_point_z();
     holding_depth = true;
 
@@ -37,15 +37,47 @@ bool Sub::althold_init()
 
 void Sub::handle_attitude()
 {
+	static float AngleIncrease = 0.0;
+	static float PrevSideDive = 0.0f;
     uint32_t tnow = AP_HAL::millis();
 
     motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     // get pilot desired lean angles
     float target_roll, target_pitch, target_yaw;
+	
+	if((g.rd_sidedive > 0.5f) && (PrevSideDive < 0.5))
+	{
+		AngleIncrease = 5.0;
+	}
+	if((g.rd_sidedive < 0.5f) && (PrevSideDive > 0.5))
+	{
+		AngleIncrease = -5.0;
+	}
+	
+	PrevSideDive = g.rd_sidedive;									// Remember previous state
+
+    if(g.rd_sidedive > 0.5f)
+    {
+		if(target_roll < 9000)
+		{
+			target_roll += AngleIncrease;
+		}
+		if(target_pitch > -6000)
+		{
+			target_pitch -= AngleIncrease;
+		}
+        target_roll = 9000;
+        target_pitch	= -6000;        // -60° nose down
+        target_yaw      = ahrs.yaw_sensor;
+        attitude_control.input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, target_yaw, true);
+        return;
+    }
+	
 
     // Check if set_attitude_target_no_gps is valid
-    if (tnow - sub.set_attitude_target_no_gps.last_message_ms < 5000) {
+    if (tnow - sub.set_attitude_target_no_gps.last_message_ms < 5000) 
+	{
         Quaternion(
             set_attitude_target_no_gps.packet.q
         ).to_euler(
@@ -53,15 +85,18 @@ void Sub::handle_attitude()
             target_pitch,
             target_yaw
         );
-        target_roll = 100 * degrees(target_roll);
-        target_pitch = 100 * degrees(target_pitch);
-        target_yaw = 100 * degrees(target_yaw);
-        last_roll = target_roll;
-        last_pitch = target_pitch;
-        last_yaw = target_yaw;
+		
+        target_roll 	= 100 * degrees(target_roll);
+        target_pitch 	= 100 * degrees(target_pitch);
+        target_yaw 		= 100 * degrees(target_yaw);
+        last_roll 		= target_roll;
+        last_pitch 		= target_pitch;
+        last_yaw 		= target_yaw;
         
         attitude_control.input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, target_yaw, true);
-    } else {
+    } 
+	else 
+	{
         // If we don't have a mavlink attitude target, we use the pilot's input instead
         get_pilot_desired_lean_angles(channel_roll->get_control_in(), channel_pitch->get_control_in(), target_roll, target_pitch, attitude_control.get_althold_lean_angle_max());
         target_yaw = get_pilot_desired_yaw_rate(channel_yaw->get_control_in());
