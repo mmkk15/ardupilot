@@ -133,7 +133,7 @@ public:
         k_param_jbtn_2,
         k_param_jbtn_3,
         k_param_jbtn_4,
-        k_param_jbtn_5,
+        k_param_jbtn_5, 		// 100
         k_param_jbtn_6,
         k_param_jbtn_7,
         k_param_jbtn_8,
@@ -143,8 +143,20 @@ public:
         k_param_jbtn_12,
         k_param_jbtn_13,
         k_param_jbtn_14,
-        k_param_jbtn_15,
-
+        k_param_jbtn_15,		// 110
+		
+		// Rudolf Diesel parameters	-----------------------------------------------------------------------------------------------------------
+		// Rudolf Diesel parameters	-----------------------------------------------------------------------------------------------------------
+		// Rudolf Diesel parameters	-----------------------------------------------------------------------------------------------------------
+		k_param_rd_fwd_cmd_RM_T = 115,
+		k_param_rd_lat_cmd_RM_T = 116,
+		k_param_rd_yaw_cmd_RM_T = 117,
+		k_param_rd_thr_cmd_RM_T = 118,
+		k_param_rd_ctrl_expo 	= 119,
+		k_param_rd_sidedive 	= 120,
+		// END Rudolf Diesel parameters	--------------------------------------------------------------------------------------------------------
+		// END Rudolf Diesel parameters	--------------------------------------------------------------------------------------------------------
+		// END Rudolf Diesel parameters	--------------------------------------------------------------------------------------------------------
 
         // PID Controllers
         k_param_p_pos_xy = 126, // deprecated
@@ -290,6 +302,15 @@ public:
     JSButton        jbtn_13;
     JSButton        jbtn_14;
     JSButton        jbtn_15;
+	
+	// Rudolf Diesel parameters
+	AP_Float		rd_fwd_cmd_RM_T;								// correlates with k_param_rd_fwd_RM_T, 115
+	AP_Float		rd_lat_cmd_RM_T;
+	AP_Float		rd_yaw_cmd_RM_T;
+	AP_Float		rd_thr_cmd_RM_T;	
+	AP_Float		rd_ctrl_expo;
+	AP_Float		rd_sidedive;
+	// END Rudolf Diesel parameters
 
     // Acro parameters
     AP_Float        acro_rp_p;
