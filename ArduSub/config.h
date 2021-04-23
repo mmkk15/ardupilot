@@ -21,6 +21,7 @@
 #define		RD_SIDEDIVE					0.0f
 #define     RD_SIDEDIVE_PHI             90.0f
 #define     RD_SIDEDIVE_THETA           -45.0f
+#define     RD_SIDEDIVE_AINC            2.0f
 
 // run at 400Hz on all systems
 # define MAIN_LOOP_RATE    400

@@ -148,14 +148,15 @@ public:
 		// Rudolf Diesel parameters	-----------------------------------------------------------------------------------------------------------
 		// Rudolf Diesel parameters	-----------------------------------------------------------------------------------------------------------
 		// Rudolf Diesel parameters	-----------------------------------------------------------------------------------------------------------
-		k_param_rd_fwd_cmd_RM_T     = 115,
-		k_param_rd_lat_cmd_RM_T     = 116,
-		k_param_rd_yaw_cmd_RM_T     = 117,
-		k_param_rd_thr_cmd_RM_T     = 118,
-		k_param_rd_ctrl_expo 	    = 119,
-		k_param_rd_sidedive 	    = 120,
-        k_param_rd_sidedive_phi     = 121,
-        k_param_rd_sidedive_theta   = 122,
+		k_param_rd_fwd_cmd_RM_T         = 115,
+		k_param_rd_lat_cmd_RM_T         = 116,
+		k_param_rd_yaw_cmd_RM_T         = 117,
+		k_param_rd_thr_cmd_RM_T         = 118,
+		k_param_rd_ctrl_expo 	        = 119,
+		k_param_rd_sidedive 	        = 120,
+        k_param_rd_sidedive_phi         = 121,
+        k_param_rd_sidedive_theta       = 122,
+        k_param_rd_sidedive_angleInc    = 123,
 		// END Rudolf Diesel parameters	--------------------------------------------------------------------------------------------------------
 		// END Rudolf Diesel parameters	--------------------------------------------------------------------------------------------------------
 		// END Rudolf Diesel parameters	--------------------------------------------------------------------------------------------------------
@@ -314,6 +315,7 @@ public:
 	AP_Float		rd_sidedive;
     AP_Float        rd_sidedive_phi;
     AP_Float        rd_sidedive_theta;
+    AP_Float        rd_sidedive_angleInc;
 	// END Rudolf Diesel parameters
 
     // Acro parameters
@@ -324,8 +326,8 @@ public:
     AP_Int8         acro_trainer;
     AP_Float        acro_expo;
 
-    AP_Float                surface_depth;
-    AP_Int8                 frame_configuration;
+    AP_Float        surface_depth;
+    AP_Int8         frame_configuration;
 
     // Note: keep initializers here in the same order as they are declared
     // above.

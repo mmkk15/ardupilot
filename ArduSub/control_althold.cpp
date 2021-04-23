@@ -37,45 +37,49 @@ bool Sub::althold_init()
 
 void Sub::handle_attitude()
 {
-	static float AngleIncrease = 0.0;
-	static float PrevSideDive = 0.0f;
+	static float PrevSideDive   = 0.0f;
     uint32_t tnow = AP_HAL::millis();
 
     motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     // get pilot desired lean angles
-    float target_roll, target_pitch, target_yaw;
+    //static uint8_t  target_angles_initialized = 0;
+    float           target_roll, target_pitch, target_yaw;
+    static float    sd_target_roll, sd_target_pitch;
+    //static uint32_t cnt = 0;
 	
 	if((g.rd_sidedive > 0.5f) && (PrevSideDive < 0.5))
 	{
-		AngleIncrease = 2.0;
-        gcs().send_text(MAV_SEVERITY_INFO, "Side Dive enabled");
+        sd_target_roll  = ahrs.roll_sensor;
+        sd_target_pitch = 0.0f;
+        gcs().send_text(MAV_SEVERITY_INFO, "Side Dive enabled, AngleIncrease = %f", (double)g.rd_sidedive_angleInc);
 	}
 	if((g.rd_sidedive < 0.5f) && (PrevSideDive > 0.5))
 	{
-		AngleIncrease = -2.0;
-        gcs().send_text(MAV_SEVERITY_INFO, "Side Dive disabled");
-	}
-	
+        sd_target_roll  = 100.0f * g.rd_sidedive_phi;
+        sd_target_pitch = ahrs.pitch_sensor;
+        gcs().send_text(MAV_SEVERITY_INFO, "Side Dive disabled, AngleIncrease = %f", (double)g.rd_sidedive_angleInc);
+	}	
 	PrevSideDive = g.rd_sidedive;									// Remember previous state
 
     if(g.rd_sidedive > 0.5f)
     {
-		if(target_roll < g.rd_sidedive_phi * 100)
+		if(sd_target_roll < g.rd_sidedive_phi * 100)
 		{
-			target_roll += AngleIncrease;
+			sd_target_roll += g.rd_sidedive_angleInc;
 		}
-		if(target_pitch > g.rd_sidedive_theta * 100)
+		if(sd_target_pitch > g.rd_sidedive_theta * 100)
 		{
-			target_pitch -= AngleIncrease;
+			sd_target_pitch -= g.rd_sidedive_angleInc;
 		}
-        target_roll     = 9000;
-        target_pitch	= 0;        // -60° nose down
+        target_roll     = sd_target_roll;
+        target_pitch	= sd_target_pitch;
         target_yaw      = ahrs.yaw_sensor;
         attitude_control.input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, target_yaw, true);
+
+        //_motors.set_yaw(channel_yaw->get_control_in() / 2000.0f);        // get control_in range [-2000; 2000];        
         return;
     }
-	
 
     // Check if set_attitude_target_no_gps is valid
     if (tnow - sub.set_attitude_target_no_gps.last_message_ms < 5000) 
