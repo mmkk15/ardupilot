@@ -407,6 +407,24 @@ const AP_Param::Info Sub::var_info[] = {
     // @User: Standard
     GSCALAR(rd_sidedive, "RD_SIDEDIVE", RD_SIDEDIVE),
 
+    // @Param: RD_SIDEDIVE_PHI
+    // @DisplayName: Sidedive phi angle [degrees]
+    // @Description: Rotate rov on the side to contol pitch via yaw
+    // @Units: -
+    // @Range: 0 - 90
+    // @Increment: 1
+    // @User: Standard
+    GSCALAR(rd_sidedive_phi, "RD_SIDEDIVE_PHI", RD_SIDEDIVE_PHI),
+
+    // @Param: RD_SIDEDIVE_PHI
+    // @DisplayName: Sidedive theta angle [degrees]
+    // @Description: Rotate rov down (via yaw)
+    // @Units: -
+    // @Range: 0 - 90
+    // @Increment: 1
+    // @User: Standard
+    GSCALAR(rd_sidedive_theta, "RD_SIDEDIVE_THETA", RD_SIDEDIVE_THETA),
+
     // @Param: RC_SPEED
     // @DisplayName: ESC Update Speed
     // @Description: This is the speed in Hertz that your ESCs will receive updates

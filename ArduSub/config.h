@@ -19,6 +19,8 @@
 #define		RD_THR_CMD_RM_T_DEFAULT		0.5f
 #define		RD_CTRL_EXPO_DEFAULT		1.0f
 #define		RD_SIDEDIVE					0.0f
+#define     RD_SIDEDIVE_PHI             90.0f
+#define     RD_SIDEDIVE_THETA           -45.0f
 
 // run at 400Hz on all systems
 # define MAIN_LOOP_RATE    400

@@ -48,27 +48,29 @@ void Sub::handle_attitude()
 	
 	if((g.rd_sidedive > 0.5f) && (PrevSideDive < 0.5))
 	{
-		AngleIncrease = 5.0;
+		AngleIncrease = 2.0;
+        gcs().send_text(MAV_SEVERITY_INFO, "Side Dive enabled");
 	}
 	if((g.rd_sidedive < 0.5f) && (PrevSideDive > 0.5))
 	{
-		AngleIncrease = -5.0;
+		AngleIncrease = -2.0;
+        gcs().send_text(MAV_SEVERITY_INFO, "Side Dive disabled");
 	}
 	
 	PrevSideDive = g.rd_sidedive;									// Remember previous state
 
     if(g.rd_sidedive > 0.5f)
     {
-		if(target_roll < 9000)
+		if(target_roll < g.rd_sidedive_phi * 100)
 		{
 			target_roll += AngleIncrease;
 		}
-		if(target_pitch > -6000)
+		if(target_pitch > g.rd_sidedive_theta * 100)
 		{
 			target_pitch -= AngleIncrease;
 		}
-        target_roll = 9000;
-        target_pitch	= -6000;        // -60° nose down
+        target_roll     = 9000;
+        target_pitch	= 0;        // -60° nose down
         target_yaw      = ahrs.yaw_sensor;
         attitude_control.input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, target_yaw, true);
         return;
