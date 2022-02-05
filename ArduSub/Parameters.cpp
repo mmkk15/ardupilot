@@ -352,6 +352,60 @@ const AP_Param::Info Sub::var_info[] = {
     // @Group: BTN15_
     // @Path: ../libraries/AP_JSButton/AP_JSButton.cpp
     GGROUP(jbtn_15,                   "BTN15_", JSButton),
+    	
+	// @Param: RD_FWD_CMD_RM_T
+    // @DisplayName: RM T for forward cmd
+    // @Description: This is the filter time constant for the reference model of the forward command
+    // @Units: -
+    // @Range: 0 - 0.99
+    // @Increment: 0.01
+    // @User: Standard
+    GSCALAR(rd_fwd_cmd_RM_T, "RD_FWD_CMD_RM_T", RD_FWD_CMD_RM_T_DEFAULT),
+
+	// @Param: RD_LAT_CMD_RM_T
+    // @DisplayName: RM T for lateral cmd
+    // @Description: This is the filter time constant for the reference model of the lateral command
+    // @Units: -
+    // @Range: 0 - 0.99
+    // @Increment: 0.01
+    // @User: Standard
+    GSCALAR(rd_lat_cmd_RM_T, "RD_LAT_CMD_RM_T", RD_LAT_CMD_RM_T_DEFAULT),
+	
+	// @Param: RD_YAW_CMD_RM_T
+    // @DisplayName: RM T for yaw cmd
+    // @Description: This is the filter time constant for the reference model of the yaw command
+    // @Units: -
+    // @Range: 0 - 0.99
+    // @Increment: 0.01
+    // @User: Standard
+    GSCALAR(rd_yaw_cmd_RM_T, "RD_YAW_CMD_RM_T", RD_YAW_CMD_RM_T_DEFAULT),
+
+	// @Param: RD_THR_CMD_RM_T
+    // @DisplayName: RM T for throttle cmd
+    // @Description: This is the filter time constant for the reference model of the throttle command
+    // @Units: -
+    // @Range: 0 - 0.99
+    // @Increment: 0.01
+    // @User: Standard
+    GSCALAR(rd_thr_cmd_RM_T, "RD_THR_CMD_RM_T", RD_THR_CMD_RM_T_DEFAULT),
+	
+	// @Param: RD_CTRL_EXPO
+    // @DisplayName: Exponential curve for all controls
+    // @Description: This lowers the curve for all controls and reduces the 
+    // @Units: -
+    // @Range: 1 - 3
+    // @Increment: 0.25
+    // @User: Standard
+    GSCALAR(rd_ctrl_expo, "RD_CTRL_EXPO", RD_CTRL_EXPO_DEFAULT),
+	
+	// @Param: RD_SIDEDIVE
+    // @DisplayName: Mode to enable side diving -> Roll = 90°
+    // @Description: Rotate rov on the side to contol pitch via yaw
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 1
+    // @User: Standard
+    GSCALAR(rd_sidedive, "RD_SIDEDIVE", RD_SIDEDIVE),
 
     // @Param: RC_SPEED
     // @DisplayName: ESC Update Speed

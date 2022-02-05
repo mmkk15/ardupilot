@@ -51,15 +51,27 @@ void Sub::init_joystick()
     gain = constrain_float(gain, 0.1, 1.0);
 }
 
+/*************************************************************************************************************************************************************/
+/*** x, y, z, r in [-1000; 1000] ***/
 void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t z, int16_t r, uint16_t buttons)
 {
 
-    float rpyScale = 0.4*gain; // Scale -1000-1000 to -400-400 with gain
-    float throttleScale = 0.8*gain*g.throttle_gain; // Scale 0-1000 to 0-800 times gain
-    int16_t rpyCenter = 1500;
-    int16_t throttleBase = 1500-500*throttleScale;
-
-    bool shift = false;
+    bool 		shift 			= false;
+    float 		rpyScale 		= 0.4 * gain; 											// Scale -1000-1000 to -400-400 with gain
+    float 		throttleScale 	= 0.8 * gain * g.throttle_gain; 						// Scale 0-1000 to 0-800 times gain
+    int16_t 	rpyCenter 		= 1500;
+    int16_t 	throttleBase 	= 1500-500*throttleScale;
+	
+	float		gamma 			= constrain_float(g.rd_ctrl_expo, 1.0, 3.0);				// Limit gamma value for expo control
+	float		xf 				= (float)constrain_int16(x, -1000, 1000) / 1000.0f;			// Calculate normalized values
+	float		yf 				= (float)constrain_int16(y, -1000, 1000) / 1000.0f;
+	float		zf 				= (float)constrain_int16(z, -1000, 1000) / 1000.0f;
+	float		rf 				= (float)constrain_int16(r, -1000, 1000) / 1000.0f;
+	
+	x 	= (int16_t)(powf(fabs(xf), gamma) * 1000.0f * copysignf(1.0f, xf));
+	y 	= (int16_t)(powf(fabs(yf), gamma) * 1000.0f * copysignf(1.0f, yf));
+	z 	= (int16_t)(powf(fabs(zf), gamma) * 1000.0f * copysignf(1.0f, zf));
+	r 	= (int16_t)(powf(fabs(rf), gamma) * 1000.0f * copysignf(1.0f, rf));
 
     // Neutralize camera tilt and pan speed setpoint
     cam_tilt = 1500;
@@ -97,6 +109,10 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
     int16_t zTot;
     int16_t yTot;
     int16_t xTot;
+    static float 	xTotFilt = 0.0f;
+	static float 	yTotFilt = 0.0f;
+	static float 	zTotFilt = 0.0f;
+	static float 	rFilt 	 = 0.0f;
 
     if (!controls_reset_since_input_hold) {
         zTot = zTrim + 500; // 500 is neutral for throttle
@@ -109,6 +125,20 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
         yTot = y + yTrim;
         xTot = x + xTrim;
     }
+    
+    // Filter xTot
+	if(g.rd_fwd_cmd_RM_T > 0.99f)	{	g.rd_fwd_cmd_RM_T = 0.99f;	}							// Check limit of forward cmd filter
+	if(g.rd_lat_cmd_RM_T > 0.99f)	{	g.rd_lat_cmd_RM_T = 0.99f;	}							// Check limit of forward lat filter
+	if(g.rd_yaw_cmd_RM_T > 0.99f)	{	g.rd_yaw_cmd_RM_T = 0.99f;	}							// Check limit of forward yaw filter
+	if(g.rd_thr_cmd_RM_T > 0.99f)	{	g.rd_thr_cmd_RM_T = 0.99f;	}							// Check limit of forward thr filter
+	xTotFilt 	= (1.0f - g.rd_fwd_cmd_RM_T) * (float)xTot + g.rd_fwd_cmd_RM_T * xTotFilt;
+	xTot 		= (int16_t)xTotFilt;
+	yTotFilt 	= (1.0f - g.rd_lat_cmd_RM_T) * (float)yTot + g.rd_lat_cmd_RM_T * yTotFilt;
+	yTot 		= (int16_t)yTotFilt;
+	zTotFilt 	= (1.0f - g.rd_thr_cmd_RM_T) * (float)zTot + g.rd_thr_cmd_RM_T * zTotFilt;
+	zTot 		= (int16_t)zTotFilt;
+	rFilt 		= (1.0f - g.rd_yaw_cmd_RM_T) * (float)r    + g.rd_yaw_cmd_RM_T * rFilt;
+	r 			= (int16_t)rFilt;
 
     RC_Channels::set_override(0, constrain_int16(pitchTrim + rpyCenter,1100,1900), tnow); // pitch
     RC_Channels::set_override(1, constrain_int16(rollTrim  + rpyCenter,1100,1900), tnow); // roll
