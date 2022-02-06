@@ -222,6 +222,12 @@ public:
         k_param_lights_steps,
         k_param_pilot_speed_dn,
 
+        k_param_M1_p = 300,
+        k_param_M1_q,
+        k_param_M1_r,
+        k_param_M1_x,
+        k_param_M1_y,
+        k_param_M1_z,
     };
 
     AP_Int16        format_version;
@@ -310,6 +316,13 @@ public:
 	AP_Float		rd_thr_cmd_RM_T;	
 	AP_Float		rd_ctrl_expo;
 	AP_Float		rd_sidedive;
+    AP_Float        rd_M1_p;
+    AP_Float        rd_M1_q;
+    AP_Float        rd_M1_r;
+    AP_Float        rd_M1_x;
+    AP_Float        rd_M1_y;
+    AP_Float        rd_M1_z;
+
 	// END Rudolf Diesel parameters
 
     // Acro parameters
