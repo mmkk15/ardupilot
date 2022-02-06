@@ -152,6 +152,17 @@ void AP_Motors6DOF::setup_motors(motor_frame_class frame_class, motor_frame_type
         break;
 
     case SUB_FRAME_VECTORED_6DOF:
+        /* Updated to fit RD ROV2 configuration */
+        //                                   Motor #              Roll Factor     Pitch Factor    Yaw Factor      Throttle Factor     Forward Factor      Lateral Factor  Testing Order
+        /* front right */ add_motor_raw_6dof(AP_MOTORS_MOT_1,     0,              0,               1.0f,          0,                  -1.0f,               1.0f,          1);
+        /* front left  */ add_motor_raw_6dof(AP_MOTORS_MOT_2,     0,              0,              -1.0f,          0,                  -1.0f,              -1.0f,          2);
+        /* rear right  */ add_motor_raw_6dof(AP_MOTORS_MOT_3,     0,              0,              -1.0f,          0,                   1.0f,               1.0f,          3);
+        /* rear left   */ add_motor_raw_6dof(AP_MOTORS_MOT_4,     0,              0,               1.0f,          0,                   1.0f,              -1.0f,          4);
+        /* centV right */ add_motor_raw_6dof(AP_MOTORS_MOT_5,      1.0f,          -1.0f,          0,              -1.0f,              0,                  0,              5);
+        /* centV left  */ add_motor_raw_6dof(AP_MOTORS_MOT_6,     -1.0f,          -1.0f,          0,              -1.0f,              0,                  0,              6);
+        /* centV rear  */ add_motor_raw_6dof(AP_MOTORS_MOT_7,     0,               1.0f,          0,              -1.0f,              0,                  0,              7);
+        /*
+        --- original data ---
         add_motor_raw_6dof(AP_MOTORS_MOT_1,     0,              0,              1.0f,           0,                  -1.0f,              1.0f,           1);
         add_motor_raw_6dof(AP_MOTORS_MOT_2,     0,              0,              -1.0f,          0,                  -1.0f,              -1.0f,          2);
         add_motor_raw_6dof(AP_MOTORS_MOT_3,     0,              0,              -1.0f,          0,                  1.0f,               1.0f,           3);
@@ -160,6 +171,7 @@ void AP_Motors6DOF::setup_motors(motor_frame_class frame_class, motor_frame_type
         add_motor_raw_6dof(AP_MOTORS_MOT_6,     -1.0f,          -1.0f,          0,              -1.0f,              0,                  0,              6);
         add_motor_raw_6dof(AP_MOTORS_MOT_7,     1.0f,           1.0f,           0,              -1.0f,              0,                  0,              7);
         add_motor_raw_6dof(AP_MOTORS_MOT_8,     -1.0f,          1.0f,           0,              -1.0f,              0,                  0,              8);
+        */
         break;
 
     case SUB_FRAME_VECTORED:
