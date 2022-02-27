@@ -17,6 +17,7 @@ int16_t yTrim = 0;
 int16_t video_switch = 1100;
 int16_t x_last, y_last, z_last;
 uint16_t buttons_prev;
+float   RD_Pitch = 0.0f;
 
 // Servo control output channels
 // TODO: Allow selecting output channels
@@ -139,12 +140,42 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
 	zTot 		= (int16_t)zTotFilt;
 	rFilt 		= (1.0f - g.rd_yaw_cmd_RM_T) * (float)r    + g.rd_yaw_cmd_RM_T * rFilt;
 	r 			= (int16_t)rFilt;
+    
+    static uint32_t     lastTS = 0;
+    if(roll_pitch_flag)
+    {   
+        if(lastTS == 0)
+        {
+            lastTS = tnow;
+        }
+        else
+        {
+            float dt = ((float)tnow - (float)lastTS) / 1000.0f;
+            lastTS = tnow;
 
-    RC_Channels::set_override(0, constrain_int16(pitchTrim + rpyCenter,1100,1900), tnow); // pitch
-    RC_Channels::set_override(1, constrain_int16(rollTrim  + rpyCenter,1100,1900), tnow); // roll
+            RD_Pitch += -((float)x / 1000.0f) * dt * 30.0f;
+            if(RD_Pitch > 90.0)  { RD_Pitch =  90.0; }
+            if(RD_Pitch < -90.0) { RD_Pitch = -90.0; }
+            //gcs().send_text(MAV_SEVERITY_INFO,"Pitch: %f, %f %f", dt, (float)x, RD_Pitch);
+        }        
 
-    RC_Channels::set_override(2, constrain_int16((zTot)*throttleScale+throttleBase,1100,1900), tnow); // throttle
-    RC_Channels::set_override(3, constrain_int16(r*rpyScale+rpyCenter,1100,1900), tnow);                 // yaw
+        static int lastRDPitch = 0;
+        if(lastRDPitch != (int)RD_Pitch)
+        {
+            lastRDPitch = (int)RD_Pitch;
+            gcs().send_text(MAV_SEVERITY_INFO,"Pitch setpoint: %3d", lastRDPitch);
+        }
+    }
+    else
+    {
+        lastTS = 0;
+    }
+
+    RC_Channels::set_override(0, constrain_int16(pitchTrim + rpyCenter,1100,1900), tnow);                       // pitch
+    RC_Channels::set_override(1, constrain_int16(rollTrim  + rpyCenter,1100,1900), tnow);                       // roll
+
+    RC_Channels::set_override(2, constrain_int16((zTot)*throttleScale+throttleBase,1100,1900), tnow);           // throttle
+    RC_Channels::set_override(3, constrain_int16(r*rpyScale+rpyCenter,1100,1900), tnow);                        // yaw
 
     // maneuver mode:
     if (roll_pitch_flag == 0) {
@@ -620,6 +651,7 @@ void Sub::handle_jsbutton_press(uint8_t button, bool shift, bool held)
     case JSButton::button_function_t::k_roll_pitch_toggle:
         if (!held) {
             roll_pitch_flag = !roll_pitch_flag;
+            gcs().send_text(MAV_SEVERITY_INFO,"Roll pitch toggle %d", roll_pitch_flag);
         }
         break;
 
