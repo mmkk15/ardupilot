@@ -157,6 +157,7 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
             if(RD_Pitch > 90.0)  { RD_Pitch =  90.0; }
             if(RD_Pitch < -90.0) { RD_Pitch = -90.0; }
             //gcs().send_text(MAV_SEVERITY_INFO,"Pitch: %f, %f %f", dt, (float)x, RD_Pitch);
+            // ahrs.get_pitch()
         }        
 
         static int lastRDPitch = 0;
