@@ -156,15 +156,20 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
             RD_Pitch += -((float)x / 1000.0f) * dt * 30.0f;
             if(RD_Pitch > 90.0)  { RD_Pitch =  90.0; }
             if(RD_Pitch < -90.0) { RD_Pitch = -90.0; }
+            (void)RD_Pitch;
             //gcs().send_text(MAV_SEVERITY_INFO,"Pitch: %f, %f %f", dt, (float)x, RD_Pitch);
-            // ahrs.get_pitch()
         }        
 
-        static int lastRDPitch = 0;
-        if(lastRDPitch != (int)RD_Pitch)
-        {
-            lastRDPitch = (int)RD_Pitch;
-            gcs().send_text(MAV_SEVERITY_INFO,"Pitch setpoint: %3d", lastRDPitch);
+        static uint32_t     lastReportTS = 0;
+        //static int          lastRDPitch = 0;
+        if(tnow - lastReportTS > 50)
+        {   
+            lastReportTS = tnow;
+            float target_roll, target_pitch, target_yaw;                                                            // get pilot desired lean angles
+            Quaternion(set_attitude_target_no_gps.packet.q).to_euler(target_roll, target_pitch, target_yaw);        // Check if set_attitude_target_no_gps is valid
+
+            //lastRDPitch = (int)RD_Pitch;
+            gcs().send_text(MAV_SEVERITY_INFO,"Pitch setpoint: %4.1f %4.1f", degrees(target_pitch), degrees(ahrs.get_pitch()));
         }
     }
     else
