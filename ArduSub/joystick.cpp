@@ -63,6 +63,7 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
     int16_t 	rpyCenter 		= 1500;
     int16_t 	throttleBase 	= 1500-500*throttleScale;
 	
+    uint32_t    tnow = AP_HAL::millis();                                                    // RD
 	float		gamma 			= constrain_float(g.rd_ctrl_expo, 1.0, 3.0);				// Limit gamma value for expo control
 	float		xf 				= (float)constrain_int16(x, -1000, 1000) / 1000.0f;			// Calculate normalized values
 	float		yf 				= (float)constrain_int16(y, -1000, 1000) / 1000.0f;
@@ -105,7 +106,56 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
         rollTrim  =  y * rpyScale;
     }
 
-    uint32_t tnow = AP_HAL::millis();
+    // RD Camera Power On Begin (Relay 1 = relay.on(0); Relay 2 = relay.on(1);...)
+    static uint32_t     lastTSChange = 0;
+    static uint32_t     TSSwitchOn = 0;
+    static uint8_t      SwitchState = 0;        // [0: off, 1 = pend, 2 = switching, 3 = waitforTimeOut ]
+    if((shift) && (SwitchState == 0))
+    {
+        if((tnow - lastTSChange) > 5000)
+        {
+            SwitchState = 1;
+        }
+    }
+    else
+    {
+        lastTSChange = tnow;
+    }
+    switch (SwitchState)
+    {
+    case 0:
+        // nothing to do
+        break;
+    
+    case 1:
+        relay.on(0);
+        TSSwitchOn  = tnow;
+        SwitchState = 2;
+        gcs().send_text(MAV_SEVERITY_INFO,"CAM ON");
+        break;
+    
+    case 2:
+        if((tnow - TSSwitchOn) > 1000)
+        {
+            TSSwitchOn = tnow;
+            SwitchState = 3;
+            relay.off(0);
+            gcs().send_text(MAV_SEVERITY_INFO,"CAM OFF");
+        }
+        break;
+
+    case 3:
+        if((tnow - TSSwitchOn) > 3000)
+        {
+            SwitchState = 0;
+            gcs().send_text(MAV_SEVERITY_INFO,"CAM switch ready ...");
+        }
+        break;
+    
+    default:
+        break;
+    }
+    // RD Camera Power On End
 
     int16_t zTot;
     int16_t yTot;
