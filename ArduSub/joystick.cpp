@@ -106,32 +106,31 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
         rollTrim  =  y * rpyScale;
     }
 
+    // ****************************************************************************************************************************
     // RD Camera Power On Begin (Relay 1 = relay.on(0); Relay 2 = relay.on(1);...)
-    static uint32_t     lastTSChange = 0;
     static uint32_t     TSSwitchOn = 0;
     static uint8_t      SwitchState = 0;        // [0: off, 1 = pend, 2 = switching, 3 = waitforTimeOut ]
-    if((shift) && (SwitchState == 0))
+    for (uint8_t i = 0 ; i < 16 ; i++) 
     {
-        if((tnow - lastTSChange) > 5000)
+        if ((buttons & (1 << i))) 
         {
-            SwitchState = 1;
+            if((get_button(i)->function(shift) == JSButton::button_function_t::k_custom_1) && (SwitchState == 0))
+            {
+                //gcs().send_text(MAV_SEVERITY_INFO,"Button #%d - Enabling SwitchState = 1", i);
+                SwitchState = 1;
+            }
         }
-    }
-    else
-    {
-        lastTSChange = tnow;
-    }
+    }    
     switch (SwitchState)
     {
     case 0:
-        // nothing to do
         break;
     
     case 1:
         relay.on(0);
         TSSwitchOn  = tnow;
         SwitchState = 2;
-        gcs().send_text(MAV_SEVERITY_INFO,"CAM ON");
+        gcs().send_text(MAV_SEVERITY_INFO,"Relay / Optocoupler ON");
         break;
     
     case 2:
@@ -140,7 +139,7 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
             TSSwitchOn = tnow;
             SwitchState = 3;
             relay.off(0);
-            gcs().send_text(MAV_SEVERITY_INFO,"CAM OFF");
+            gcs().send_text(MAV_SEVERITY_INFO,"Relay / Optocoupler OFF");
         }
         break;
 
@@ -148,14 +147,15 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
         if((tnow - TSSwitchOn) > 3000)
         {
             SwitchState = 0;
-            gcs().send_text(MAV_SEVERITY_INFO,"CAM switch ready ...");
+            gcs().send_text(MAV_SEVERITY_INFO,"Relay / Optocoupler switch ready ...");
         }
-        break;
-    
+        break;    
     default:
         break;
     }
     // RD Camera Power On End
+    // ****************************************************************************************************************************
+
 
     int16_t zTot;
     int16_t yTot;
