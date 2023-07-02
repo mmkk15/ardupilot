@@ -407,6 +407,182 @@ const AP_Param::Info Sub::var_info[] = {
     // @User: Standard
     GSCALAR(rd_sidedive, "RD_SIDEDIVE", RD_SIDEDIVE),
 
+    /******************************************* M1 *******************************************************/
+    // @Param: RD_M1_YAW
+    // @DisplayName: Thrust contribution of motor1 to yaw
+    // @Description: Motor 1 - yaw - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m1_yaw, "RD_M1_YAW", RD_M1_YAW),    
+    // @Param: RD_M1_FORWARD
+    // @DisplayName: Thrust contribution of motor1 to forward
+    // @Description: Motor 1 - yaw - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m1_forward, "RD_M1_FORWARD", RD_M1_FORWARD),
+    // @Param: RD_M1_LATERAL
+    // @DisplayName: Thrust contribution of motor1 to lateral
+    // @Description: Motor 1 - yaw - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m1_lateral, "RD_M1_LATERAL", RD_M1_LATERAL),
+    /******************************************* M2 *******************************************************/
+    // @Param: RD_M2_YAW
+    // @DisplayName: Thrust contribution of motor2 to yaw
+    // @Description: Motor 2 - yaw - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m2_yaw, "RD_M2_YAW", RD_M2_YAW),
+    // @Param: RD_M2_FORWARD
+    // @DisplayName: Thrust contribution of motor2 to forward
+    // @Description: Motor 2 - yaw - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m2_forward, "RD_M2_FORWARD", RD_M2_FORWARD),
+    // @Param: RD_M2_LATERAL
+    // @DisplayName: Thrust contribution of motor2 to lateral
+    // @Description: Motor 2 - yaw - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m2_lateral, "RD_M2_LATERAL", RD_M2_LATERAL),
+    /******************************************* M3 *******************************************************/
+    // @Param: RD_M3_YAW
+    // @DisplayName: Thrust contribution of motor3 to yaw
+    // @Description: Motor 3 - yaw - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m3_yaw, "RD_M3_YAW", RD_M3_YAW),
+    // @Param: RD_M3_FORWARD
+    // @DisplayName: Thrust contribution of motor3 to forward
+    // @Description: Motor 3 - yaw - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m3_forward, "RD_M3_FORWARD", RD_M3_FORWARD),
+    // @Param: RD_M3_LATERAL
+    // @DisplayName: Thrust contribution of motor3 to lateral
+    // @Description: Motor 3 - yaw - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m3_lateral, "RD_M3_LATERAL", RD_M3_LATERAL),
+    /******************************************* M4 *******************************************************/
+    // @Param: RD_M4_YAW
+    // @DisplayName: Thrust contribution of motor4 to yaw
+    // @Description: Motor 4 - yaw - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m4_yaw, "RD_M4_YAW", RD_M4_YAW),
+    // @Param: RD_M4_FORWARD
+    // @DisplayName: Thrust contribution of motor4 to forward
+    // @Description: Motor 4 - yaw - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m4_forward, "RD_M4_FORWARD", RD_M4_FORWARD),
+    // @Param: RD_M4_LATERAL
+    // @DisplayName: Thrust contribution of motor4 to lateral
+    // @Description: Motor 4 - yaw - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m4_lateral, "RD_M4_LATERAL", RD_M4_LATERAL),
+    /******************************************* M5 *******************************************************/
+    // @Param: RD_M5_ROLL
+    // @DisplayName: Thrust contribution of motor5 to roll
+    // @Description: Motor 5 - roll - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m5_roll, "RD_M5_ROLL", RD_M5_ROLL),
+    // @Param: RD_M5_PITCH
+    // @DisplayName: Thrust contribution of motor5 to pitch
+    // @Description: Motor 5 - pitch - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m5_pitch, "RD_M5_PITCH", RD_M5_PITCH),
+    // @Param: RD_M5_THROTTLE
+    // @DisplayName: Thrust contribution of motor5 to throttle
+    // @Description: Motor 5 - throttle - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m5_throttle, "RD_M5_THROTTLE", RD_M5_THROTTLE),
+    /******************************************* M6 *******************************************************/
+    // @Param: RD_M6_ROLL
+    // @DisplayName: Thrust contribution of motor6 to roll
+    // @Description: Motor 5 - roll - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m6_roll, "RD_M6_ROLL", RD_M6_ROLL),
+    // @Param: RD_M6_PITCH
+    // @DisplayName: Thrust contribution of motor6 to pitch
+    // @Description: Motor 6 - pitch - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m6_pitch, "RD_M6_PITCH", RD_M6_PITCH),
+    // @Param: RD_M6_THROTTLE
+    // @DisplayName: Thrust contribution of motor6 to throttle
+    // @Description: Motor 6 - throttle - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m6_throttle, "RD_M6_THROTTLE", RD_M6_THROTTLE),
+    /******************************************* M7 *******************************************************/
+    // @Param: RD_M7_ROLL
+    // @DisplayName: Thrust contribution of motor7 to roll
+    // @Description: Motor 7 - roll - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m7_roll, "RD_M7_ROLL", RD_M7_ROLL),
+    // @Param: RD_M7_PITCH
+    // @DisplayName: Thrust contribution of motor7 to pitch
+    // @Description: Motor 7 - pitch - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m7_pitch, "RD_M7_PITCH", RD_M7_PITCH),
+    // @Param: RD_M7_THROTTLE
+    // @DisplayName: Thrust contribution of motor7 to throttle
+    // @Description: Motor 7 - throttle - coefficient
+    // @Units: -
+    // @Range: 0 - 1
+    // @Increment: 0.05
+    // @User: Standard
+    GSCALAR(rd_m7_throttle, "RD_M7_THROTTLE", RD_M7_THROTTLE),
+
     // @Param: RC_SPEED
     // @DisplayName: ESC Update Speed
     // @Description: This is the speed in Hertz that your ESCs will receive updates

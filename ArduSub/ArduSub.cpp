@@ -288,6 +288,36 @@ void Sub::one_hz_loop()
     // need to set "likely flying" when armed to allow for compass
     // learning to run
     ahrs.set_likely_flying(hal.util->get_soft_armed());
+
+    // Update M1 coefficients
+    motors.set_motor_coefficient(0, 2, g.rd_m1_yaw);
+    motors.set_motor_coefficient(0, 4, g.rd_m1_forward);
+    motors.set_motor_coefficient(0, 5, g.rd_m1_lateral);
+    // Update M2 coefficients
+    motors.set_motor_coefficient(1, 2, g.rd_m2_yaw);
+    motors.set_motor_coefficient(1, 4, g.rd_m2_forward);
+    motors.set_motor_coefficient(1, 5, g.rd_m2_lateral);
+    // Update M3 coefficients
+    motors.set_motor_coefficient(2, 2, g.rd_m3_yaw);
+    motors.set_motor_coefficient(2, 4, g.rd_m3_forward);
+    motors.set_motor_coefficient(2, 5, g.rd_m3_lateral);
+    // Update M4 coefficients
+    motors.set_motor_coefficient(3, 2, g.rd_m4_yaw);
+    motors.set_motor_coefficient(3, 4, g.rd_m4_forward);
+    motors.set_motor_coefficient(3, 5, g.rd_m4_lateral);
+    // Update M5 coefficients
+    motors.set_motor_coefficient(4, 0, g.rd_m5_roll);
+    motors.set_motor_coefficient(4, 1, g.rd_m5_pitch);
+    motors.set_motor_coefficient(4, 3, g.rd_m5_throttle);
+    // Update M6 coefficients
+    motors.set_motor_coefficient(5, 0, g.rd_m6_roll);
+    motors.set_motor_coefficient(5, 1, g.rd_m6_pitch);
+    motors.set_motor_coefficient(5, 3, g.rd_m6_throttle);
+    // Update M7 coefficients
+    motors.set_motor_coefficient(6, 0, g.rd_m7_roll);
+    motors.set_motor_coefficient(6, 1, g.rd_m7_pitch);
+    motors.set_motor_coefficient(6, 3, g.rd_m7_throttle);
+    
 }
 
 // called at 50hz

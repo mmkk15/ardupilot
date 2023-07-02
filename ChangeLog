@@ -1,0 +1,26 @@
+*** Instructions: ***
+- Change pitch trim angle
+	* Press Shift+Depth_Hold (Buttons 1+2)
+	* Check output window
+
+
+
+
+02.07.2023 - Version 4.1.4
+Goal: Get parameters of Motor 6 DOF config loaded from parameters
+RD_M1_Roll
+
+
+
+
+/************************************************************************************************/
+*** Good to know: ***
+
+Upload binary via USB
+	./waf --upload sub
+
+Debug output on QGCS:
+	gcs().send_text(MAV_SEVERITY_INFO, "Relay / Optocoupler OFF");
+
+Access parameters:
+	g.rd_fwd_cmd_RM_T

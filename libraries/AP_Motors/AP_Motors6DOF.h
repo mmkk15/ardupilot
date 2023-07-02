@@ -8,6 +8,9 @@
 #include <RC_Channel/RC_Channel.h>     // RC Channel Library
 #include "AP_MotorsMatrix.h"
 
+#define MOTORS_MAX_COUNT    8
+#define MOTORS_MAX_AXIS     6
+
 /// @class      AP_MotorsMatrix
 class AP_Motors6DOF : public AP_MotorsMatrix {
 public:
@@ -15,6 +18,13 @@ public:
     AP_Motors6DOF(uint16_t loop_rate, uint16_t speed_hz = AP_MOTORS_SPEED_DEFAULT) :
         AP_MotorsMatrix(loop_rate, speed_hz) {
         AP_Param::setup_object_defaults(this, var_info);
+        for(uint8_t m = 0; m < MOTORS_MAX_COUNT; m++)
+        {
+            for(uint8_t c = 0; c < MOTORS_MAX_AXIS; c++)
+            {
+                _Mcoeff[m][c] = 0.0f;
+            }
+        }
     };
 
     // Supported frame types
@@ -28,6 +38,15 @@ public:
         SUB_FRAME_SIMPLEROV_5,
         SUB_FRAME_CUSTOM
     } sub_frame_t;
+
+    typedef enum {
+        AXIS_ROLL,
+        AXIS_PITCH,
+        AXIS_YAW,
+        AXIS_THROTTLE,
+        AXIS_FORWARD,
+        AXIS_LATERAL
+    } motor_axis_t;
 
     // Override parent
     void setup_motors(motor_frame_class frame_class, motor_frame_type frame_type) override;
@@ -56,6 +75,17 @@ public:
     // var_info for holding Parameter information
     static const struct AP_Param::GroupInfo        var_info[];
 
+    void set_motor_coefficient(uint8_t Motor, uint8_t Axis, float coefficient) {
+        if((Motor >= MOTORS_MAX_COUNT) || (Axis >= MOTORS_MAX_AXIS))
+        {
+            return;
+        }
+        else
+        {
+            _Mcoeff[Motor][Axis] = coefficient;
+        }
+    }
+
 protected:
     // return current_limit as a number from 0 ~ 1 in the range throttle_min to throttle_max
     float               get_current_limit_max_throttle() override;
@@ -78,4 +108,7 @@ protected:
     // current limiting
     float _output_limited = 1.0f;
     float _batt_current_last = 0.0f;
+
+private:
+    float _Mcoeff[8][6];
 };

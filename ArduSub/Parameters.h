@@ -146,17 +146,8 @@ public:
         k_param_jbtn_15,
 
         // Rudolf Diesel parameters	-----------------------------------------------------------------------------------------------------------
-		// Rudolf Diesel parameters	-----------------------------------------------------------------------------------------------------------
-		// Rudolf Diesel parameters	-----------------------------------------------------------------------------------------------------------
-        k_param_rd_fwd_cmd_RM_T = 115,
-		k_param_rd_lat_cmd_RM_T = 116,
-		k_param_rd_yaw_cmd_RM_T = 117,
-		k_param_rd_thr_cmd_RM_T = 118,
-		k_param_rd_ctrl_expo 	= 119,
-		k_param_rd_sidedive 	= 120,
-		// END Rudolf Diesel parameters	--------------------------------------------------------------------------------------------------------
-		// END Rudolf Diesel parameters	--------------------------------------------------------------------------------------------------------
-		// END Rudolf Diesel parameters	--------------------------------------------------------------------------------------------------------
+        /* 115 - 120 used for Rudolf Diesel parameters */
+        // END Rudolf Diesel parameters	--------------------------------------------------------------------------------------------------------
 
         // PID Controllers
         k_param_p_pos_xy = 126, // deprecated
@@ -221,6 +212,51 @@ public:
         k_param_cam_slew_limit = 237, // deprecated
         k_param_lights_steps,
         k_param_pilot_speed_dn,
+
+        // Rudolf Diesel parameters	-----------------------------------------------------------------------------------------------------------
+		// Rudolf Diesel parameters	-----------------------------------------------------------------------------------------------------------
+		// Rudolf Diesel parameters	-----------------------------------------------------------------------------------------------------------
+        
+        k_param_rd_fwd_cmd_RM_T = 115,
+		k_param_rd_lat_cmd_RM_T = 116,
+		k_param_rd_yaw_cmd_RM_T = 117,
+		k_param_rd_thr_cmd_RM_T = 118,
+		k_param_rd_ctrl_expo 	= 119,
+		k_param_rd_sidedive 	= 120,        
+        
+        /* 300 - 400 used for Rudolf Diesel parameters */
+        k_param_rd_m1_yaw 	    = 300,
+        k_param_rd_m1_forward   = 301,
+        k_param_rd_m1_lateral   = 302,
+        /* M2 */
+        k_param_rd_m2_yaw 	    = 310,
+        k_param_rd_m2_forward   = 311,
+        k_param_rd_m2_lateral   = 312,
+        /* M3 */
+        k_param_rd_m3_yaw 	    = 320,
+        k_param_rd_m3_forward   = 321,
+        k_param_rd_m3_lateral   = 322,
+        /* M4 */
+        k_param_rd_m4_yaw 	    = 330,
+        k_param_rd_m4_forward   = 331,
+        k_param_rd_m4_lateral   = 332,
+        /* M5 */
+        k_param_rd_m5_roll 	    = 340,
+        k_param_rd_m5_pitch     = 341,
+        k_param_rd_m5_throttle  = 342,
+        /* M6 */
+        k_param_rd_m6_roll 	    = 350,
+        k_param_rd_m6_pitch     = 351,
+        k_param_rd_m6_throttle  = 352,
+        /* M7 */
+        k_param_rd_m7_roll 	    = 360,
+        k_param_rd_m7_pitch     = 361,
+        k_param_rd_m7_throttle  = 362,
+
+		// END Rudolf Diesel parameters	--------------------------------------------------------------------------------------------------------
+		// END Rudolf Diesel parameters	--------------------------------------------------------------------------------------------------------
+		// END Rudolf Diesel parameters	--------------------------------------------------------------------------------------------------------
+        
     };
 
     AP_Int16        format_version;
@@ -309,7 +345,27 @@ public:
 	AP_Float		rd_thr_cmd_RM_T;	
 	AP_Float		rd_ctrl_expo;
     AP_Float		rd_sidedive;
-
+    AP_Float        rd_m1_yaw;
+    AP_Float        rd_m1_forward;
+    AP_Float        rd_m1_lateral;
+    AP_Float        rd_m2_yaw;
+    AP_Float        rd_m2_forward;
+    AP_Float        rd_m2_lateral;
+    AP_Float        rd_m3_yaw;
+    AP_Float        rd_m3_forward;
+    AP_Float        rd_m3_lateral;
+    AP_Float        rd_m4_yaw;
+    AP_Float        rd_m4_forward;
+    AP_Float        rd_m4_lateral;
+    AP_Float        rd_m5_roll;
+    AP_Float        rd_m5_pitch;
+    AP_Float        rd_m5_throttle;
+    AP_Float        rd_m6_roll;
+    AP_Float        rd_m6_pitch;
+    AP_Float        rd_m6_throttle;
+    AP_Float        rd_m7_roll;
+    AP_Float        rd_m7_pitch;
+    AP_Float        rd_m7_throttle;
 	// END Rudolf Diesel parameters
 
     // Acro parameters
@@ -320,8 +376,8 @@ public:
     AP_Int8         acro_trainer;
     AP_Float        acro_expo;
 
-    AP_Float                surface_depth;
-    AP_Int8                 frame_configuration;
+    AP_Float        surface_depth;
+    AP_Int8         frame_configuration;
 
     // Note: keep initializers here in the same order as they are declared
     // above.

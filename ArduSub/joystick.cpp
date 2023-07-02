@@ -63,7 +63,7 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
     int16_t 	rpyCenter 		= 1500;
     int16_t 	throttleBase 	= 1500-500*throttleScale;
 	
-    uint32_t    tnow = AP_HAL::millis();                                                    // RD
+    uint32_t    tnow__ms = AP_HAL::millis();                                                    // RD
 	float		gamma 			= constrain_float(g.rd_ctrl_expo, 1.0, 3.0);				// Limit gamma value for expo control
 	float		xf 				= (float)constrain_int16(x, -1000, 1000) / 1000.0f;			// Calculate normalized values
 	float		yf 				= (float)constrain_int16(y, -1000, 1000) / 1000.0f;
@@ -104,6 +104,17 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
     // adjust roll/pitch trim with joystick input instead of forward/lateral
         pitchTrim = -x * rpyScale;
         rollTrim  =  y * rpyScale;
+
+        static uint32_t lts__ms = 0;
+        if(lts__ms == 0)
+        {
+            lts__ms = tnow__ms;
+        }
+        else if(tnow__ms - lts__ms > 1000)
+        {
+            lts__ms = tnow__ms;
+            gcs().send_text(MAV_SEVERITY_INFO,"pitch_trim: %d", pitchTrim);
+        }
     }
 
     // ****************************************************************************************************************************
@@ -128,15 +139,15 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
     
     case 1:
         relay.on(0);
-        TSSwitchOn  = tnow;
+        TSSwitchOn  = tnow__ms;
         SwitchState = 2;
         gcs().send_text(MAV_SEVERITY_INFO,"Relay / Optocoupler ON");
         break;
     
     case 2:
-        if((tnow - TSSwitchOn) > 1000)
+        if((tnow__ms - TSSwitchOn) > 1000)
         {
-            TSSwitchOn = tnow;
+            TSSwitchOn = tnow__ms;
             SwitchState = 3;
             relay.off(0);
             gcs().send_text(MAV_SEVERITY_INFO,"Relay / Optocoupler OFF");
@@ -144,7 +155,7 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
         break;
 
     case 3:
-        if((tnow - TSSwitchOn) > 3000)
+        if((tnow__ms - TSSwitchOn) > 3000)
         {
             SwitchState = 0;
             gcs().send_text(MAV_SEVERITY_INFO,"Relay / Optocoupler switch ready ...");
@@ -191,64 +202,69 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
 	rFilt 		= (1.0f - g.rd_yaw_cmd_RM_T) * (float)r    + g.rd_yaw_cmd_RM_T * rFilt;
 	r 			= (int16_t)rFilt;
     
-    static uint32_t     lastTS = 0;
+    static uint32_t     lastTS__ms = 0;
+    static float        OutputTime = 0.0f;
     if(roll_pitch_flag)
     {   
-        if(lastTS == 0)
+        if(lastTS__ms == 0)
         {
-            lastTS = tnow;
+            lastTS__ms = tnow__ms;
         }
         else
         {
-            float dt = ((float)tnow - (float)lastTS) / 1000.0f;
-            lastTS = tnow;
+            float dt = ((float)tnow__ms - (float)lastTS__ms) / 1000.0f;
+            lastTS__ms = tnow__ms;
 
-            RD_Pitch += -((float)x / 1000.0f) * dt * 30.0f;
+            RD_Pitch += -((float)x / 1000.0f) * dt * 10.0f;
             if(RD_Pitch > 90.0)  { RD_Pitch =  90.0; }
             if(RD_Pitch < -90.0) { RD_Pitch = -90.0; }
             (void)RD_Pitch;
-            //gcs().send_text(MAV_SEVERITY_INFO,"Pitch: %f, %f %f", dt, (float)x, RD_Pitch);
+            OutputTime += dt;
+            if(OutputTime >= 0.5f)
+            {
+                OutputTime = 0.0f;
+                gcs().send_text(MAV_SEVERITY_INFO,"RD Pitch angle: %2.1f°", RD_Pitch);
+            }
         }        
 
         static uint32_t     lastReportTS = 0;
-        //static int          lastRDPitch = 0;
-        if(tnow - lastReportTS > 50)
+        if(tnow__ms - lastReportTS > 100)
         {   
-            lastReportTS = tnow;
+            lastReportTS = tnow__ms;
             float target_roll, target_pitch, target_yaw;                                                            // get pilot desired lean angles
             Quaternion(set_attitude_target_no_gps.packet.q).to_euler(target_roll, target_pitch, target_yaw);        // Check if set_attitude_target_no_gps is valid
 
             //lastRDPitch = (int)RD_Pitch;
-            gcs().send_text(MAV_SEVERITY_INFO,"Pitch setpoint: %4.1f %4.1f", degrees(target_pitch), degrees(ahrs.get_pitch()));
+            // gcs().send_text(MAV_SEVERITY_INFO,"Pitch setpoint: %4.1f %4.1f", degrees(target_pitch), degrees(ahrs.get_pitch()));
         }
     }
     else
     {
-        lastTS = 0;
+        lastTS__ms = 0;
     }
 
-    RC_Channels::set_override(0, constrain_int16(pitchTrim + rpyCenter,1100,1900), tnow);                       // pitch
-    RC_Channels::set_override(1, constrain_int16(rollTrim  + rpyCenter,1100,1900), tnow);                       // roll
+    RC_Channels::set_override(0, constrain_int16(pitchTrim + rpyCenter,1100,1900), tnow__ms);                       // pitch
+    RC_Channels::set_override(1, constrain_int16(rollTrim  + rpyCenter,1100,1900), tnow__ms);                       // roll
 
-    RC_Channels::set_override(2, constrain_int16((zTot)*throttleScale+throttleBase,1100,1900), tnow);           // throttle
-    RC_Channels::set_override(3, constrain_int16(r*rpyScale+rpyCenter,1100,1900), tnow);                        // yaw
+    RC_Channels::set_override(2, constrain_int16((zTot)*throttleScale+throttleBase,1100,1900), tnow__ms);           // throttle
+    RC_Channels::set_override(3, constrain_int16(r*rpyScale+rpyCenter,1100,1900), tnow__ms);                        // yaw
 
     // maneuver mode:
     if (roll_pitch_flag == 0) {
         // adjust forward and lateral with joystick input instead of roll and pitch
-        RC_Channels::set_override(4, constrain_int16((xTot)*rpyScale+rpyCenter,1100,1900), tnow); // forward for ROV
-        RC_Channels::set_override(5, constrain_int16((yTot)*rpyScale+rpyCenter,1100,1900), tnow); // lateral for ROV
+        RC_Channels::set_override(4, constrain_int16((xTot)*rpyScale+rpyCenter,1100,1900), tnow__ms); // forward for ROV
+        RC_Channels::set_override(5, constrain_int16((yTot)*rpyScale+rpyCenter,1100,1900), tnow__ms); // lateral for ROV
     } else {
         // neutralize forward and lateral input while we are adjusting roll and pitch
-        RC_Channels::set_override(4, constrain_int16(xTrim*rpyScale+rpyCenter,1100,1900), tnow); // forward for ROV
-        RC_Channels::set_override(5, constrain_int16(yTrim*rpyScale+rpyCenter,1100,1900), tnow); // lateral for ROV
+        RC_Channels::set_override(4, constrain_int16(xTrim*rpyScale+rpyCenter,1100,1900), tnow__ms); // forward for ROV
+        RC_Channels::set_override(5, constrain_int16(yTrim*rpyScale+rpyCenter,1100,1900), tnow__ms); // lateral for ROV
     }
 
-    RC_Channels::set_override(6, cam_pan, tnow);       // camera pan
-    RC_Channels::set_override(7, cam_tilt, tnow);      // camera tilt
-    RC_Channels::set_override(8, lights1, tnow);       // lights 1
-    RC_Channels::set_override(9, lights2, tnow);       // lights 2
-    RC_Channels::set_override(10, video_switch, tnow); // video switch
+    RC_Channels::set_override(6, cam_pan, tnow__ms);       // camera pan
+    RC_Channels::set_override(7, cam_tilt, tnow__ms);      // camera tilt
+    RC_Channels::set_override(8, lights1, tnow__ms);       // lights 1
+    RC_Channels::set_override(9, lights2, tnow__ms);       // lights 2
+    RC_Channels::set_override(10, video_switch, tnow__ms); // video switch
 
     // Store old x, y, z values for use in input hold logic
     x_last = x;

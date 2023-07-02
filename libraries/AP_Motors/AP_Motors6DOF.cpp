@@ -153,14 +153,24 @@ void AP_Motors6DOF::setup_motors(motor_frame_class frame_class, motor_frame_type
 
     case SUB_FRAME_VECTORED_6DOF:
         /* Updated to fit RD ROV2 configuration */
-        //                                   Motor #              Roll Factor     Pitch Factor    Yaw Factor      Throttle Factor     Forward Factor      Lateral Factor  Testing Order
-        /* front right */ add_motor_raw_6dof(AP_MOTORS_MOT_1,     0,              0,               1.0f,          0,                  -1.0f,               1.0f,          1);
-        /* front left  */ add_motor_raw_6dof(AP_MOTORS_MOT_2,     0,              0,              -1.0f,          0,                  -1.0f,              -1.0f,          2);
-        /* rear right  */ add_motor_raw_6dof(AP_MOTORS_MOT_3,     0,              0,              -1.0f,          0,                   1.0f,               1.0f,          3);
-        /* rear left   */ add_motor_raw_6dof(AP_MOTORS_MOT_4,     0,              0,               1.0f,          0,                   1.0f,              -1.0f,          4);
-        /* centV right */ add_motor_raw_6dof(AP_MOTORS_MOT_5,     1.0f,           0,               0,            -1.0f,                0,                  0,             5);
-        /* centV left  */ add_motor_raw_6dof(AP_MOTORS_MOT_6,    -1.0f,           0,               0,            -1.0f,                0,                  0,             6);
-        /* centV rear  */ add_motor_raw_6dof(AP_MOTORS_MOT_7,     0,              1.0f,            0,            -1.0f,                0,                  0,             7);
+        //                                   Motor #          0Roll           1Pitch         2Yaw           3Throttle      4Forward        5Lateral       Testing Order
+        /* front right */ add_motor_raw_6dof(AP_MOTORS_MOT_1, _Mcoeff[0][0],  _Mcoeff[0][1], _Mcoeff[0][2], _Mcoeff[0][3], _Mcoeff[0][4],  _Mcoeff[0][5], 1);
+        /* front left  */ add_motor_raw_6dof(AP_MOTORS_MOT_2, _Mcoeff[1][0],  _Mcoeff[1][1], _Mcoeff[1][2], _Mcoeff[1][3], _Mcoeff[1][4],  _Mcoeff[1][5], 2);
+        /* rear right  */ add_motor_raw_6dof(AP_MOTORS_MOT_3, _Mcoeff[2][0],  _Mcoeff[2][1], _Mcoeff[2][2], _Mcoeff[2][3], _Mcoeff[2][4],  _Mcoeff[2][5], 3);
+        /* rear left   */ add_motor_raw_6dof(AP_MOTORS_MOT_4, _Mcoeff[3][0],  _Mcoeff[3][1], _Mcoeff[3][2], _Mcoeff[3][3], _Mcoeff[3][4],  _Mcoeff[3][5], 4);
+        /* centV right */ add_motor_raw_6dof(AP_MOTORS_MOT_5, _Mcoeff[4][0],  _Mcoeff[4][1], _Mcoeff[4][2], _Mcoeff[4][3], _Mcoeff[4][4],  _Mcoeff[4][5], 5);
+        /* centV left  */ add_motor_raw_6dof(AP_MOTORS_MOT_6, _Mcoeff[5][0],  _Mcoeff[5][1], _Mcoeff[5][2], _Mcoeff[5][3], _Mcoeff[5][4],  _Mcoeff[5][5], 6);
+        /* centV rear  */ add_motor_raw_6dof(AP_MOTORS_MOT_7, _Mcoeff[6][0],  _Mcoeff[6][1], _Mcoeff[6][2], _Mcoeff[6][3], _Mcoeff[6][4],  _Mcoeff[6][5], 7);
+       /*     
+       //                                  Motor #          0Roll     1Pitch    2Yaw           3Throttle    4Forward    5Lateral   Testing Order
+        front right add_motor_raw_6dof(AP_MOTORS_MOT_1,     0,        0,        _Mcoeff[0][2], 0,           -1.0f,      1.0f,        1);
+        front left  add_motor_raw_6dof(AP_MOTORS_MOT_2,     0,        0,       -1.0f,          0,           -1.0f,     -1.0f,        2);
+        rear right  add_motor_raw_6dof(AP_MOTORS_MOT_3,     0,        0,       -1.0f,          0,            1.0f,      1.0f,        3);
+        rear left   add_motor_raw_6dof(AP_MOTORS_MOT_4,     0,        0,        1.0f,          0,            1.0f,     -1.0f,        4);
+        centV right add_motor_raw_6dof(AP_MOTORS_MOT_5,     1.0f,     0,        0,            -1.0f,         0,         0,           5);
+        centV left  add_motor_raw_6dof(AP_MOTORS_MOT_6,    -1.0f,     0,        0,            -1.0f,         0,         0,           6);
+        centV rear  add_motor_raw_6dof(AP_MOTORS_MOT_7,     0,        1.0f,     0,            -1.0f,         0,         0,           7);
+        */
         /*
                         --- original data ---
                         add_motor_raw_6dof(AP_MOTORS_MOT_1,     0,              0,              1.0f,           0,                  -1.0f,              1.0f,           1);

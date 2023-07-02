@@ -19,6 +19,27 @@
 #define		RD_THR_CMD_RM_T_DEFAULT		0.5f
 #define		RD_CTRL_EXPO_DEFAULT		1.0f
 #define		RD_SIDEDIVE					0.0f
+#define		RD_M1_YAW					1.0f
+#define		RD_M1_FORWARD		        -1.0f
+#define		RD_M1_LATERAL				0.0f
+#define		RD_M2_YAW				    -1.0f
+#define		RD_M2_FORWARD				-1.0f
+#define		RD_M2_LATERAL				0.0f
+#define		RD_M3_YAW					-1.0f
+#define		RD_M3_FORWARD				1.0f
+#define		RD_M3_LATERAL				0.0f
+#define		RD_M4_YAW					1.0f
+#define		RD_M4_FORWARD				1.0f
+#define		RD_M4_LATERAL				0.0f
+#define		RD_M5_ROLL  				1.0f
+#define		RD_M5_PITCH					0.0f
+#define		RD_M5_THROTTLE				-1.0f
+#define		RD_M6_ROLL					-1.0f
+#define		RD_M6_PITCH					0.0f
+#define		RD_M6_THROTTLE				-1.0f
+#define		RD_M7_ROLL					0.0f
+#define		RD_M7_PITCH					1.0f
+#define		RD_M7_THROTTLE				0.05f
 
 // run at 400Hz on all systems
 # define MAIN_LOOP_RATE    400
