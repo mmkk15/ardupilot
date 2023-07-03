@@ -30,6 +30,9 @@ void Sub::init_ardupilot()
     // load parameters from EEPROM
     load_parameters();
 
+    // Set motor coefficients
+    set_motor_coefficients_from_parameters();
+
     BoardConfig.init();
 #if HAL_WITH_UAVCAN
     BoardConfig_CAN.init();

@@ -288,7 +288,10 @@ void Sub::one_hz_loop()
     // need to set "likely flying" when armed to allow for compass
     // learning to run
     ahrs.set_likely_flying(hal.util->get_soft_armed());
+}
 
+void Sub::set_motor_coefficients_from_parameters()
+{
     // Update M1 coefficients
     motors.set_motor_coefficient(0, 2, g.rd_m1_yaw);
     motors.set_motor_coefficient(0, 4, g.rd_m1_forward);
@@ -317,7 +320,6 @@ void Sub::one_hz_loop()
     motors.set_motor_coefficient(6, 0, g.rd_m7_roll);
     motors.set_motor_coefficient(6, 1, g.rd_m7_pitch);
     motors.set_motor_coefficient(6, 3, g.rd_m7_throttle);
-    
 }
 
 // called at 50hz
