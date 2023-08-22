@@ -99,24 +99,6 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
 
     buttons_prev = buttons;
 
-    // attitude mode:
-    if (roll_pitch_flag == 1) {
-    // adjust roll/pitch trim with joystick input instead of forward/lateral
-        pitchTrim = -x * rpyScale;
-        rollTrim  =  y * rpyScale;
-
-        static uint32_t lts__ms = 0;
-        if(lts__ms == 0)
-        {
-            lts__ms = tnow__ms;
-        }
-        else if(tnow__ms - lts__ms > 1000)
-        {
-            lts__ms = tnow__ms;
-            gcs().send_text(MAV_SEVERITY_INFO,"pitch_trim: %d", pitchTrim);
-        }
-    }
-
     // ****************************************************************************************************************************
     // RD Camera Power On Begin (Relay 1 = relay.on(0); Relay 2 = relay.on(1);...)
     static uint32_t     TSSwitchOn = 0;
@@ -166,8 +148,6 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
     }
     // RD Camera Power On End
     // ****************************************************************************************************************************
-
-
     int16_t zTot;
     int16_t yTot;
     int16_t xTot;
@@ -202,8 +182,15 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
 	rFilt 		= (1.0f - g.rd_yaw_cmd_RM_T) * (float)r    + g.rd_yaw_cmd_RM_T * rFilt;
 	r 			= (int16_t)rFilt;
     
+    // attitude mode:
+    if (roll_pitch_flag == 1)                           // original ArduSub section
+    {
+        // adjust roll/pitch trim with joystick input instead of forward/lateral
+        // pitchTrim = -x * rpyScale; // MK removed to have pitchTrim calculated by integration of stick commands - see below
+        rollTrim  =  y * rpyScale;
+    }
+
     static uint32_t     lastTS__ms = 0;
-    static float        OutputTime = 0.0f;
     if(roll_pitch_flag)
     {   
         if(lastTS__ms == 0)
@@ -215,27 +202,17 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
             float dt = ((float)tnow__ms - (float)lastTS__ms) / 1000.0f;
             lastTS__ms = tnow__ms;
 
-            RD_Pitch += -((float)x / 1000.0f) * dt * 10.0f;
-            if(RD_Pitch > 90.0)  { RD_Pitch =  90.0; }
-            if(RD_Pitch < -90.0) { RD_Pitch = -90.0; }
-            (void)RD_Pitch;
-            OutputTime += dt;
-            if(OutputTime >= 0.5f)
+            RD_Pitch += -((float)x / 1000.0f) * dt * 10.0f;             // Integrate pitch angle from stick deflection
+            if(RD_Pitch > 70.0)  { RD_Pitch =  70.0; }                  // Limit max pitch angle
+            if(RD_Pitch < -70.0) { RD_Pitch = -70.0; }                  // Limit min pitch angle
+            pitchTrim = RD_Pitch * 100.0f;                              // Set pitch angle
+
+            static int16_t lastPitchTrim = 0;
+            if(abs(pitchTrim - lastPitchTrim) > 50)
             {
-                OutputTime = 0.0f;
+                lastPitchTrim = pitchTrim;
                 gcs().send_text(MAV_SEVERITY_INFO,"RD Pitch angle: %2.1f°", RD_Pitch);
             }
-        }        
-
-        static uint32_t     lastReportTS = 0;
-        if(tnow__ms - lastReportTS > 100)
-        {   
-            lastReportTS = tnow__ms;
-            float target_roll, target_pitch, target_yaw;                                                            // get pilot desired lean angles
-            Quaternion(set_attitude_target_no_gps.packet.q).to_euler(target_roll, target_pitch, target_yaw);        // Check if set_attitude_target_no_gps is valid
-
-            //lastRDPitch = (int)RD_Pitch;
-            // gcs().send_text(MAV_SEVERITY_INFO,"Pitch setpoint: %4.1f %4.1f", degrees(target_pitch), degrees(ahrs.get_pitch()));
         }
     }
     else
@@ -330,6 +307,10 @@ void Sub::handle_jsbutton_press(uint8_t button, bool shift, bool held)
         camera_mount.set_angle_targets(0, 0, 0);
         // for some reason the call to set_angle_targets changes the mode to mavlink targeting!
         camera_mount.set_mode(MAV_MOUNT_MODE_RC_TARGETING);
+        if(roll_pitch_flag)
+        {
+            pitchTrim = 0;
+        }
 #endif
         break;
     case JSButton::button_function_t::k_mount_tilt_up:
