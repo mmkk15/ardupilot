@@ -309,7 +309,11 @@ void Sub::handle_jsbutton_press(uint8_t button, bool shift, bool held)
         camera_mount.set_mode(MAV_MOUNT_MODE_RC_TARGETING);
         if(roll_pitch_flag)
         {
+            gcs().send_text(MAV_SEVERITY_INFO, "Zeroing pitch trim");
+            RD_Pitch = 0.0f;
             pitchTrim = 0;
+            gcs().send_text(MAV_SEVERITY_INFO,"RD Pitch angle: %2.1f°", RD_Pitch);
+            roll_pitch_flag = 0;
         }
 #endif
         break;
