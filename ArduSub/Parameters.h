@@ -146,7 +146,7 @@ public:
         k_param_jbtn_15,
 
         // Rudolf Diesel parameters	-----------------------------------------------------------------------------------------------------------
-        /* 115 - 120 used for Rudolf Diesel parameters */
+        /* 115 - 125 used for Rudolf Diesel parameters */
         // END Rudolf Diesel parameters	--------------------------------------------------------------------------------------------------------
 
         // PID Controllers
@@ -223,6 +223,8 @@ public:
 		k_param_rd_thr_cmd_RM_T = 118,
 		k_param_rd_ctrl_expo 	= 119,
 		k_param_rd_sidedive 	= 120,        
+        k_param_rd_rollAngle 	= 121,
+        k_param_rd_pitchAngle 	= 122,
         
         /* 300 - 400 used for Rudolf Diesel parameters */
         k_param_rd_m1_yaw 	    = 300,
@@ -345,6 +347,8 @@ public:
 	AP_Float		rd_thr_cmd_RM_T;	
 	AP_Float		rd_ctrl_expo;
     AP_Float		rd_sidedive;
+    AP_Float        rd_rollAngle;
+    AP_Float        rd_pitchAngle;
     AP_Float        rd_m1_yaw;
     AP_Float        rd_m1_forward;
     AP_Float        rd_m1_lateral;

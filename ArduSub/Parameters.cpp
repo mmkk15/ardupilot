@@ -407,6 +407,24 @@ const AP_Param::Info Sub::var_info[] = {
     // @User: Standard
     GSCALAR(rd_sidedive, "RD_SIDEDIVE", RD_SIDEDIVE),
 
+    // @Param: RD_ROLLANGLE
+    // @DisplayName: ROLL default setpoing angle
+    // @Description: Rotate around x axis
+    // @Units: -
+    // @Range: -45 <-> 45
+    // @Increment: 1
+    // @User: Standard
+    GSCALAR(rd_rollAngle, "RD_ROLLANGLE", RD_ROLLANGLE),
+
+    // @Param: RD_PITCHANGLE
+    // @DisplayName: Pitch default setpoing angle
+    // @Description: Rotate around y axis
+    // @Units: -
+    // @Range: -80 <-> 80
+    // @Increment: 1
+    // @User: Standard
+    GSCALAR(rd_pitchAngle, "RD_PITCHANGLE", RD_PITCHANGLE),
+
     /******************************************* M1 *******************************************************/
     // @Param: RD_M1_YAW
     // @DisplayName: Thrust contribution of motor1 to yaw

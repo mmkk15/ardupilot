@@ -186,8 +186,8 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
     if (roll_pitch_flag == 1)                           // original ArduSub section
     {
         // adjust roll/pitch trim with joystick input instead of forward/lateral
-        // pitchTrim = -x * rpyScale; // MK removed to have pitchTrim calculated by integration of stick commands - see below
-        rollTrim  =  y * rpyScale;
+        //pitchTrim = -x * rpyScale; // MK removed to have pitchTrim calculated by integration of stick commands - see below
+        //rollTrim  =  y * rpyScale;
     }
 
     static uint32_t     lastTS__ms = 0;
@@ -202,15 +202,15 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
             float dt = ((float)tnow__ms - (float)lastTS__ms) / 1000.0f;
             lastTS__ms = tnow__ms;
 
-            RD_Pitch += -((float)x / 1000.0f) * dt * 10.0f;             // Integrate pitch angle from stick deflection
-            if(RD_Pitch > 70.0)  { RD_Pitch =  70.0; }                  // Limit max pitch angle
-            if(RD_Pitch < -70.0) { RD_Pitch = -70.0; }                  // Limit min pitch angle
-            pitchTrim = RD_Pitch * 100.0f;                              // Set pitch angle
+            RD_Pitch += -((float)x / 1000.0f) * dt * 15.0f;             // Integrate pitch angle from stick deflection
+            if(RD_Pitch > 85.0)  { RD_Pitch =  85.0; }                  // Limit max pitch angle
+            if(RD_Pitch < -85.0) { RD_Pitch = -85.0; }                  // Limit min pitch angle
+            g.rd_pitchAngle = RD_Pitch;
 
             static int16_t lastPitchTrim = 0;
-            if(abs(pitchTrim - lastPitchTrim) > 50)
+            if(abs(g.rd_pitchAngle - lastPitchTrim) > 3)
             {
-                lastPitchTrim = pitchTrim;
+                lastPitchTrim = g.rd_pitchAngle;
                 gcs().send_text(MAV_SEVERITY_INFO,"RD Pitch angle: %2.1f°", RD_Pitch);
             }
         }
@@ -310,8 +310,8 @@ void Sub::handle_jsbutton_press(uint8_t button, bool shift, bool held)
         if(roll_pitch_flag)
         {
             gcs().send_text(MAV_SEVERITY_INFO, "Zeroing pitch trim");
-            RD_Pitch = 0.0f;
-            pitchTrim = 0;
+            RD_Pitch            = 0.0f;
+            g.rd_pitchAngle     = 0.0f;
             gcs().send_text(MAV_SEVERITY_INFO,"RD Pitch angle: %2.1f°", RD_Pitch);
             roll_pitch_flag = 0;
         }

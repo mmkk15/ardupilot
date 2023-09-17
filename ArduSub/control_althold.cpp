@@ -44,6 +44,15 @@ void Sub::handle_attitude()
     // get pilot desired lean angles
     float target_roll, target_pitch, target_yaw;
 
+    target_roll     = 100.0f * g.rd_rollAngle;
+    target_pitch    = 100.0f * g.rd_pitchAngle;
+    target_yaw      = ahrs.yaw_sensor;
+
+    attitude_control.input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, target_yaw, true);
+
+    return;
+
+
     // Check if set_attitude_target_no_gps is valid
     if (tnow - sub.set_attitude_target_no_gps.last_message_ms < 5000) {
         Quaternion(
