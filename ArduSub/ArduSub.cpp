@@ -322,6 +322,20 @@ void Sub::set_motor_coefficients_from_parameters()
     motors.set_motor_coefficient(6, 3, g.rd_m7_throttle);
 }
 
+void Sub::debug_motor_coefficients()
+{
+    // Debug parameters
+    gcs().send_text(MAV_SEVERITY_INFO, "*** MOTOR CONTROL MATRIX ***");
+    gcs().send_text(MAV_SEVERITY_INFO, "Mx Roll_ Pitch Yaw__ Throt Fwd__ Lat__");
+    for(int i = 0; i < 8; i++)
+    {
+        gcs().send_text(MAV_SEVERITY_INFO, "M%1d %+.2f %+.2f %+.2f %+.2f %+.2f %+.2f ", i + 1, //
+            motors.get_motor_coefficient(i, 0), motors.get_motor_coefficient(i, 1), motors.get_motor_coefficient(i, 2), 
+            motors.get_motor_coefficient(i, 3), motors.get_motor_coefficient(i, 4), motors.get_motor_coefficient(i, 5));
+    }
+    gcs().send_text(MAV_SEVERITY_INFO, "*** MOTOR CONTROL MATRIX ***");
+}
+
 // called at 50hz
 void Sub::update_GPS()
 {

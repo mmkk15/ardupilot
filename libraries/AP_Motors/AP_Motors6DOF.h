@@ -86,6 +86,11 @@ public:
         }
     }
 
+    float get_motor_coefficient(int Motor, int Axis)
+    {
+        return _Mcoeff[Motor][Axis];
+    }
+
 protected:
     // return current_limit as a number from 0 ~ 1 in the range throttle_min to throttle_max
     float               get_current_limit_max_throttle() override;
@@ -110,5 +115,5 @@ protected:
     float _batt_current_last = 0.0f;
 
 private:
-    float _Mcoeff[8][6];
+    float _Mcoeff[MOTORS_MAX_COUNT][MOTORS_MAX_AXIS];
 };

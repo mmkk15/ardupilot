@@ -183,11 +183,18 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
 	r 			= (int16_t)rFilt;
     
     // attitude mode:
+    static bool DebugMotorFlags = true;
     if (roll_pitch_flag == 1)                           // original ArduSub section
     {
         // adjust roll/pitch trim with joystick input instead of forward/lateral
         //pitchTrim = -x * rpyScale; // MK removed to have pitchTrim calculated by integration of stick commands - see below
         //rollTrim  =  y * rpyScale;
+
+        if(DebugMotorFlags)
+        {
+            debug_motor_coefficients();
+            DebugMotorFlags = false;
+        }
     }
 
     static uint32_t     lastTS__ms = 0;
@@ -218,6 +225,7 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
     else
     {
         lastTS__ms = 0;
+        DebugMotorFlags = true;
     }
 
     RC_Channels::set_override(0, constrain_int16(pitchTrim + rpyCenter,1100,1900), tnow__ms);                       // pitch

@@ -50,6 +50,13 @@ void Sub::handle_attitude()
 
     attitude_control.input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, target_yaw, true);
 
+    static int count = 0;
+    if(count++ > 100)
+    {
+        count = 0;
+        gcs().send_text(MAV_SEVERITY_INFO, "Roll/Pitch = %.2f/%.2f", (double)g.rd_rollAngle, (double)g.rd_pitchAngle);
+    }
+
     return;
 
 
