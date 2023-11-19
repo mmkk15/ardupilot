@@ -21,6 +21,7 @@
 #define		RD_SIDEDIVE					0.0f
 #define		RD_ROLLANGLE				0.0f
 #define		RD_PITCHANGLE				0.0f
+#define     RD_PITCHRATE                1.0f
 #define		RD_M1_YAW					1.0f
 #define		RD_M1_FORWARD		        -1.0f
 #define		RD_M1_LATERAL				0.0f

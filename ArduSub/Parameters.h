@@ -225,6 +225,7 @@ public:
 		k_param_rd_sidedive 	= 120,        
         k_param_rd_rollAngle 	= 121,
         k_param_rd_pitchAngle 	= 122,
+        k_param_rd_pitchRate    = 123,
         
         /* 300 - 400 used for Rudolf Diesel parameters */
         k_param_rd_m1_yaw 	    = 300,
@@ -349,6 +350,7 @@ public:
     AP_Float		rd_sidedive;
     AP_Float        rd_rollAngle;
     AP_Float        rd_pitchAngle;
+    AP_Float        rd_pitchRate;
     AP_Float        rd_m1_yaw;
     AP_Float        rd_m1_forward;
     AP_Float        rd_m1_lateral;

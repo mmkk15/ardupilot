@@ -209,17 +209,21 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
             float dt = ((float)tnow__ms - (float)lastTS__ms) / 1000.0f;
             lastTS__ms = tnow__ms;
 
-            RD_Pitch += -((float)x / 1000.0f) * dt * 15.0f;             // Integrate pitch angle from stick deflection
-            if(RD_Pitch > 85.0)  { RD_Pitch =  85.0; }                  // Limit max pitch angle
-            if(RD_Pitch < -85.0) { RD_Pitch = -85.0; }                  // Limit min pitch angle
-            g.rd_pitchAngle = RD_Pitch;
-
-            static int16_t lastPitchTrim = 0;
-            if(abs(g.rd_pitchAngle - lastPitchTrim) > 3)
+            static int rd_pitch = 0;
+            if(rd_pitch != (int)g.rd_pitchAngle)
             {
-                lastPitchTrim = g.rd_pitchAngle;
-                gcs().send_text(MAV_SEVERITY_INFO,"RD Pitch angle: %2.1f°", RD_Pitch);
+                rd_pitch = (int)g.rd_pitchAngle;
+                gcs().send_text(MAV_SEVERITY_INFO, "Roll/Pitch = %.2d/%.2d", (int)g.rd_rollAngle, (int)g.rd_pitchAngle);
             }
+
+            /* RD Pitch by roll */
+            if((y > 100) || (y < -100))
+            {
+                RD_Pitch += (float)(y / 1000.0f) * dt * g.rd_pitchRate;             // Integrate pitch angle from stick deflection
+            }
+            /* RD Pitch by roll end */
+
+            g.rd_pitchAngle = RD_Pitch;
         }
     }
     else

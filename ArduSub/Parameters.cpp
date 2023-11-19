@@ -425,6 +425,15 @@ const AP_Param::Info Sub::var_info[] = {
     // @User: Standard
     GSCALAR(rd_pitchAngle, "RD_PITCHANGLE", RD_PITCHANGLE),
 
+    // @Param: RD_PITCHRATE
+    // @DisplayName: Pitch rate for pitch trim [deg/s]
+    // @Description: Pitch trim change rate
+    // @Units: -
+    // @Range: 0.1 <-> 10
+    // @Increment: 0.1
+    // @User: Standard
+    GSCALAR(rd_pitchRate, "RD_PITCHRATE", RD_PITCHRATE),
+
     /******************************************* M1 *******************************************************/
     // @Param: RD_M1_YAW
     // @DisplayName: Thrust contribution of motor1 to yaw
