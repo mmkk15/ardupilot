@@ -181,21 +181,6 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
 	zTot 		= (int16_t)zTotFilt;
 	rFilt 		= (1.0f - g.rd_yaw_cmd_RM_T) * (float)r    + g.rd_yaw_cmd_RM_T * rFilt;
 	r 			= (int16_t)rFilt;
-    
-    // attitude mode:
-    static bool DebugMotorFlags = true;
-    if (roll_pitch_flag == 1)                           // original ArduSub section
-    {
-        // adjust roll/pitch trim with joystick input instead of forward/lateral
-        //pitchTrim = -x * rpyScale; // MK removed to have pitchTrim calculated by integration of stick commands - see below
-        //rollTrim  =  y * rpyScale;
-
-        if(DebugMotorFlags)
-        {
-            debug_motor_coefficients();
-            DebugMotorFlags = false;
-        }
-    }
 
     static uint32_t     lastTS__ms = 0;
     if(roll_pitch_flag)
@@ -213,7 +198,7 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
             if(rd_pitch != (int)g.rd_pitchAngle)
             {
                 rd_pitch = (int)g.rd_pitchAngle;
-                gcs().send_text(MAV_SEVERITY_INFO, "Roll/Pitch = %.2d/%.2d", (int)g.rd_rollAngle, (int)g.rd_pitchAngle);
+                gcs().send_text(MAV_SEVERITY_INFO, "Pitch = %.2d°", (int)g.rd_pitchAngle);
             }
 
             /* RD Pitch by roll */
@@ -221,15 +206,13 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
             {
                 RD_Pitch += (float)(y / 1000.0f) * dt * g.rd_pitchRate;             // Integrate pitch angle from stick deflection
             }
-            /* RD Pitch by roll end */
-
             g.rd_pitchAngle = RD_Pitch;
+            /* RD Pitch by roll end */
         }
     }
     else
     {
         lastTS__ms = 0;
-        DebugMotorFlags = true;
     }
 
     RC_Channels::set_override(0, constrain_int16(pitchTrim + rpyCenter,1100,1900), tnow__ms);                       // pitch
@@ -273,6 +256,8 @@ void Sub::handle_jsbutton_press(uint8_t button, bool shift, bool held)
     Vector3f localPitch = Vector3f(0, 1, 0);
     Vector3f localRoll = Vector3f(1, 0, 0);
 
+    static bool DebugMotorCoefficients = true;
+
     // Act based on the function assigned to this button
     switch (get_button(button)->function(shift)) {
     case JSButton::button_function_t::k_arm_toggle:
@@ -283,14 +268,32 @@ void Sub::handle_jsbutton_press(uint8_t button, bool shift, bool held)
         }
         break;
     case JSButton::button_function_t::k_arm:
+        if (!motors.armed()) 
+        {
+            RD_Pitch            = 0.0f;
+            g.rd_pitchAngle     = 0.0f;
+            gcs().send_text(MAV_SEVERITY_INFO,"Pitch: %2.1f° - zeroed after arming", RD_Pitch);
+        }
         arming.arm(AP_Arming::Method::MAVLINK);
+        if(DebugMotorCoefficients)
+        {
+            debug_motor_coefficients();
+            DebugMotorCoefficients = false;
+        }
         break;
     case JSButton::button_function_t::k_disarm:
         arming.disarm();
+        DebugMotorCoefficients = true;
         break;
 
     case JSButton::button_function_t::k_mode_manual:
         set_mode(MANUAL, MODE_REASON_TX_COMMAND);
+        if(g.rd_pitchAngle != 0.0f)
+        {
+            RD_Pitch            = 0.0f;
+            g.rd_pitchAngle     = 0.0f;
+            gcs().send_text(MAV_SEVERITY_INFO,"Pitch: %2.1f° - zeroed for manual", RD_Pitch);
+        }
         break;
     case JSButton::button_function_t::k_mode_stabilize:
         set_mode(STABILIZE, MODE_REASON_TX_COMMAND);
@@ -319,14 +322,6 @@ void Sub::handle_jsbutton_press(uint8_t button, bool shift, bool held)
         camera_mount.set_angle_targets(0, 0, 0);
         // for some reason the call to set_angle_targets changes the mode to mavlink targeting!
         camera_mount.set_mode(MAV_MOUNT_MODE_RC_TARGETING);
-        if(roll_pitch_flag)
-        {
-            gcs().send_text(MAV_SEVERITY_INFO, "Zeroing pitch trim");
-            RD_Pitch            = 0.0f;
-            g.rd_pitchAngle     = 0.0f;
-            gcs().send_text(MAV_SEVERITY_INFO,"RD Pitch angle: %2.1f°", RD_Pitch);
-            roll_pitch_flag = 0;
-        }
 #endif
         break;
     case JSButton::button_function_t::k_mount_tilt_up:
@@ -718,10 +713,6 @@ void Sub::handle_jsbutton_press(uint8_t button, bool shift, bool held)
         break;
 
     case JSButton::button_function_t::k_roll_pitch_toggle:
-        if (!held) {
-            roll_pitch_flag = !roll_pitch_flag;
-            gcs().send_text(MAV_SEVERITY_INFO,"Roll pitch toggle %d", roll_pitch_flag);
-        }
         break;
 
     case JSButton::button_function_t::k_custom_1:
@@ -737,10 +728,23 @@ void Sub::handle_jsbutton_press(uint8_t button, bool shift, bool held)
         // Not implemented
         break;
     case JSButton::button_function_t::k_custom_5:
-        // Not implemented
+        RD_Pitch            = 0.0f;
+        g.rd_pitchAngle     = 0.0f;
+        gcs().send_text(MAV_SEVERITY_INFO,"Pitch: %2.1f° - zeroed", RD_Pitch);
         break;
     case JSButton::button_function_t::k_custom_6:
-        // Not implemented
+        if (!held) {
+            roll_pitch_flag = !roll_pitch_flag;
+            if(roll_pitch_flag)
+            {
+                gcs().send_text(MAV_SEVERITY_INFO,"Pitch trim enabled");
+            }
+            else
+            {
+                gcs().send_text(MAV_SEVERITY_INFO,"Pitch trim disabled");
+            }
+
+        }
         break;
     }
 }
