@@ -3,6 +3,7 @@
 - Switch pitch trim on/off on function custom_6
 - Zeroing of pitch angle on function custom_5 (right click on control button)
 - Zeroing of pitch angle when arming (if disarmed before)
+- Zeroing of pitch angle when enabling MANUAL mode
 
 *** Instructions: ***
 - Change pitch trim angle
