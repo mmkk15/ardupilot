@@ -1,9 +1,15 @@
 /************************************************************************************************/
+240218
+- Enabled manouvering during pitch trimming
+
 231203
-- Switch pitch trim on/off on function custom_6
+- Setting the pitch angle
+  + Switch pitch trim on/off on function custom_6
+  + rd_pitchRate: Rate with which he pitch is being integrated [deg/s]
 - Zeroing of pitch angle on function custom_5 (right click on control button)
 - Zeroing of pitch angle when arming (if disarmed before)
 - Zeroing of pitch angle when enabling MANUAL mode
+
 
 *** Instructions: ***
 - Change pitch trim angle
@@ -15,10 +21,6 @@
 
 02.07.2023 - Version 4.1.4
 Motor coefficients are loaded from parameters
-
-
-
-
 
 /************************************************************************************************/
 *** Good to know: ***
